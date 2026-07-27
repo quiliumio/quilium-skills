@@ -1,0 +1,5 @@
+{
+  "name": "quilium",
+  "description": "Build and operate Quilium CMS sites with Claude Code: a builder skill (architecture, templates, project process) and a webmaster skill (content, media, translations, SEO). Both route to the live Quilium MCP skill library rather than duplicating it.",
+  "version": "0.1.0"
+}
