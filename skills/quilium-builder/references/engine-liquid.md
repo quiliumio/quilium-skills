@@ -64,6 +64,24 @@ form value — must go through `| escape`:
 This applies to anything a remote API returns, too. If a response echoes the user's input back to you,
 escape it or don't render it.
 
+### HTML-bearing fields render with no filter at all
+
+A `wysiwyg` or `embed` field **is** HTML. Output it bare:
+
+```liquid
+{{ content.custom.body }}
+```
+
+**There is no `safe` filter.** Reaching for one is the reflex this section exists to head off — and it does not
+degrade to a no-op: `strictFilters` is on, so an unknown filter name raises an error and takes the page down
+with a **500**. Since nothing was escaped in the first place, there is nothing to undo.
+
+The mirror-image mistake is `| escape` on a `wysiwyg`: it renders the editor's tags as visible `&lt;p&gt;` text.
+Escape visitor input, never editor-authored HTML.
+
+One consequence worth holding onto: a `wysiwyg` is unusable for a slug, an anchor or a CSS class, because its
+value comes out wrapped in `<p>` and breaks the attribute it lands in. Those fields are `text`.
+
 ## Filters worth knowing
 
 `escape` · `default:` · `append:` · `remove_last:` · `remove_first:` · `replace_last:` · `truncate:` ·
@@ -71,6 +89,17 @@ escape it or don't render it.
 
 **`slice` does not work on strings.** It returns an empty string, silently, both as `slice: -1` and as
 `slice: 0, n`. Use `remove_last`, `remove_first`, `replace_last` or `truncate` instead. `size` works fine.
+
+**Generic Liquid documentation is not a reliable guide to this filter set.** Quilium defines its own filters and
+they shadow the built-ins, so a filter you'd expect from general Liquid reference material may be absent here,
+and one that is present may take different arguments. Two consequences, failing in opposite ways:
+
+- **An absent filter is loud** — `strictFilters` turns it into an error and a 500. That includes `safe`.
+- **A shadowed filter is silent.** `date` is Quilium's own: the call syntax is Liquid's (`| date: 'arg'`) but
+  the tokens are Day.js — `{{ item.publishedAt | date: 'DD MMMM YYYY' }}`. Pass a strftime pattern like
+  `'%d/%m/%Y'` and nothing errors; the date simply renders wrong.
+
+Which is rule zero again: probe the filter on the install before building logic on it.
 
 ## Linking to a page — named routes
 
@@ -153,9 +182,13 @@ run.
 
 ## Fields with a shape worth knowing
 
-- **Media and page references** are arrays of objects — `[{ "id": "<uuid>" }]` — when written. At render, a
-  page reference is hydrated: `content.custom.myLink[0].url`, `.slug` and `.navTitle` all work. Read the
-  rendered HTML when debugging a link, not the MCP projection, which shows the raw stored form. Images have
+- **Media references are arrays of objects** — `[{ "id": "<uuid>" }]` — when written. **Id references are not.**
+  `page`, `items` and `smartselect` with `source: items` are written as a flat array of id strings —
+  `["<uuid>"]`. The two shapes are not interchangeable, and on a `page` field the object shape is destructive
+  rather than merely wrong: it stores a corrupt value on create and **silently empties the field on update**,
+  returning 200 either way. `items` self-heals; `page` does not — see `practices-ops-mcp-batching` §5. At
+  render, a page reference is hydrated: `content.custom.myLink[0].url`, `.slug` and `.navTitle` all work. Read
+  the rendered HTML when debugging a link, not the MCP projection, which shows the raw stored form. Images have
   their own chain of ways to render nothing — see `media.md`.
 - **`""` is truthy.** Only `nil` and `false` are falsy in Liquid, and Quilium returns unfilled text and url
   fields as `""`, not `nil`. So `{% if content.custom.caption %}` enters the filled branch on an empty field

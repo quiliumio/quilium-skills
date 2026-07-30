@@ -36,9 +36,33 @@ this by typing rich text?** A bullet list, a list of links, a paragraph with a b
 `wysiwyg` field. A `repeat` is for typed mini-records whose shape rich text cannot carry: icon + title +
 image + link, repeated.
 
+### Ask the rich-text question per block, and answer the palette question with it
+
+Run it on every candidate block and record the outcome, the same way you record the shape. It has two halves
+and the second is the one that gets skipped:
+
+1. **Should this be rich text?** Standard HTML the editor could type → one `wysiwyg`. Mini-record shapes, and
+   anything landing in an attribute, URL, slug, anchor or CSS class → typed fields.
+2. **Does the style palette need a variant for it?** If the answer to (1) is yes *only if* the editor can apply
+   a button, a styled list or a callout, then the palette needs that variant — and that is a decision, not a
+   detail. Skipping it is what forks the block back into four rigid `text` fields.
+
+**Load `reference-wysiwyg-config` here, with `practices-conventions-architecture`.** The palette is site-wide
+settings, so it is decided once, now, for the whole site. If the skill isn't in your manifest, read the site's
+existing `wysiwyg` settings and mirror that shape rather than inventing the syntax.
+
+This has to happen before step 2 because each variant the palette covers is a field you never declare — and
+because reversing it later is a migration, not an edit: schema changes plus re-authoring every block whose
+content was split across typed fields.
+
 ## Step 2 — the CMS base
 
 Write the schemas, then the pages, then the routes. Within this step the order is:
+
+**0 · the wysiwyg style palette** — write it before the schemas that assume it. Every variant it carries is a
+field the content-types below don't declare, so writing it first is what keeps step 1's decisions from quietly
+reverting to typed fields at the keyboard. It lives in site-wide settings, which means the read → merge → write
+rule at the end of this step applies to it too. Details in `reference-wysiwyg-config`.
 
 **1 · ItemSets** — including the collection that will store form submissions, which must exist before the form
 content-type that writes into it.

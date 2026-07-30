@@ -1,6 +1,6 @@
 ---
 name: quilium-builder
-description: Load when building or restructuring a Quilium CMS site — designing the architecture (page-types, content-types, ItemSets, global fields), writing YAML schemas, wiring routes and detail pages, scaffolding Liquid templates, porting a static HTML prototype, uploading media, or setting up a project locally. Covers the end-to-end process for a new site, the listing-to-detail chain, images, the 404, and the CLI loop (init, run, push, dictionary). Triggers on "new Quilium site", "build this site", "design the architecture", "create a content type", "add a page type", "scaffold a template", "port this prototype", "detail page", "the links point to the wrong page", "images are missing", "the 404 doesn't work", "set up the project", "quilium init", "quilium push", "the site doesn't render". For content work on a site that already runs, use quilium-webmaster instead.
+description: Load when building or restructuring a Quilium CMS site — designing the architecture (page-types, content-types, ItemSets, global fields), writing YAML schemas, wiring routes and detail pages, scaffolding Liquid templates, porting a static HTML prototype, uploading media, or setting up a project locally. Covers the end-to-end process for a new site, the listing-to-detail chain, images, the 404, and the CLI loop (init, run, push, dictionary). Triggers on "new Quilium site", "build this site", "design the architecture", "create a content type", "add a page type", "scaffold a template", "port this prototype", "detail page", "the links point to the wrong page", "images are missing", "the 404 doesn't work", "set up the project", "quilium init", "quilium push", "the site doesn't render", "wysiwyg or repeat", "custom wysiwyg styles", "editor style palette", "should this be a rich text field". For content work on a site that already runs, use quilium-webmaster instead.
 ---
 
 # Quilium builder
@@ -57,6 +57,47 @@ almost nothing belongs in global fields.
 
 Don't take a compressed version of that matrix from here or anywhere else. Read it live.
 
+### Rich text is the option before the four
+
+The first question the matrix asks isn't which primitive — it's whether the editor needs one at all. **Ask it
+out loud, per block, before writing its schema**, and write the answer into your architecture note next to the
+shape you chose. Skipping it is how a hero ends up with four rigid `text` fields.
+
+**The test — is each item just standard HTML the editor could type?** A bullet list, a link list, a paragraph
+followed by a button, numbered prose steps, short Q/A: **yes → one `wysiwyg` field. Stop.** Not a `repeat`, not
+four `text` fields.
+
+**When it doesn't apply**, and you keep the typed shape:
+
+- The item is a **mini-record whose shape rich text cannot express** — icon + title + image + link, repeated.
+  That's a `repeat`.
+- The value **lands in an attribute, a URL, a slug, an anchor or a CSS class.** A `wysiwyg` wraps its output in
+  `<p>`, which breaks attribute injection. Those stay `text`.
+- The editor needs to **filter, search or reorder items individually** — that's a collection, and the matrix
+  takes over.
+
+The signature of getting it wrong: a `repeat` whose sub-fields are all `text` or `wysiwyg`. That's a `wysiwyg`
+in disguise — collapse it.
+
+What makes the "yes" branch hold in practice is the site-wide **style palette** — buttons, styled lists,
+callouts, coloured spans, available to the editor from the toolbar. Without it, every visual variant the design
+needs pushes you back into typed fields, and you get the rigid schema the matrix warns against. The palette is
+what turns "the editor can type this" from a hope into a fact. So the second question is **when the palette
+needs a new variant**: the answer is *whenever a block would otherwise be forked into typed fields for a
+button, a styled list or a callout* — add the variant once, site-wide, and every editor on the site gains it.
+
+**Load `reference-wysiwyg-config` before writing schemas, alongside
+`practices-conventions-architecture`.** It carries the palette configuration and a starter pack. Two reasons
+it belongs early rather than whenever rich text next comes up:
+
+- **It changes the YAML you write.** Each variant the palette covers is a field you don't declare. Deciding it
+  after the schemas exist means rewriting them.
+- **The palette is site-wide settings, not per-type.** One decision for the whole site, and a settings write
+  replaces its target wholesale — read, merge, write back complete.
+
+Retrofitting this onto a site whose content is already authored is a migration: schema edits plus re-authoring
+every block that was split across typed fields. Decide it in step 1.
+
 ## Building a new site
 
 Five steps, in this order. The order encodes dependencies — see `references/process-new-site.md` for the
@@ -75,8 +116,9 @@ Templates come **before** content: you want to see a block render before you aut
 
 These aren't preferences. Each one, broken, produces a failure that looks like something else.
 
-- **Templates are `.liquid`**, full path always (`elements/hero.liquid`, never `hero.liquid`). If a loaded
-  reference shows another extension, it is out of date — `.liquid` wins.
+- **Templates are `.liquid`**, full path always (`elements/hero.liquid`, never `hero.liquid`). It is the only
+  loadable extension: any other value in a `template:` is ENOENT → **500**, never a fallback. That covers mail
+  bodies too (`sendmail`'s `config.template`). A value with no extension does resolve — `.liquid` is appended.
 - **Never write a URL path or a page UUID in a template.** Both are CMS identifiers; a template that hardcodes
   one breaks the day a slug is translated or a locale is added. The indirection is a **named route**, consumed
   as `{{ 'routename' | url }}`. See `references/engine-liquid.md`.
@@ -107,6 +149,7 @@ skill that isn't coming.
 | You're about to… | Load if offered | Otherwise |
 |---|---|---|
 | Decide the shape of a feature | `practices-conventions-architecture` | ask the wysiwyg question first: a bullet list or a paragraph-with-CTA is one field, not a `repeat` |
+| Give the editor rich text that matches the design | `reference-wysiwyg-config` | read the site's existing `wysiwyg` settings and mirror that shape — never invent the palette syntax |
 | Choose a field type | `reference-fields-catalog` | probe one in the back-office before committing a schema to it |
 | Name anything | `practices-conventions-naming` | camelCase keys, consistent site-wide, full template path, `.liquid` |
 | Design the editor's experience | `practices-conventions-cms-ux` | — |

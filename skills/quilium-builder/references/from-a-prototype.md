@@ -53,6 +53,33 @@ Two rules that catch most of the drift:
   moments — sometimes by different agents. A template reading `subtitle` where the content wrote `subline`
   renders empty and reports nothing.
 
+### The one licensed deviation: collapsing markup into rich text
+
+Everything above says transcribe. There is exactly one place where you may legitimately *not* reproduce the
+prototype's structure as template markup: when a block's HTML is **standard HTML the editor could type** — a
+`<ul>` of services, a paragraph followed by a link styled as a button, a numbered list of steps — you may drop
+the markup from the template and expose **one `wysiwyg` field** instead of transcribing it into typed fields.
+
+**Ask this per block, while reading the prototype, before writing the schema.** It is the same question step 1
+asks; here it has teeth, because the prototype is showing you the exact markup and you can see whether a person
+could type it.
+
+This is not a liberty with the design, and that distinction is the whole point:
+
+- **The rendered HTML must still come out with the prototype's own tags and classes.** That is the condition,
+  not a nice-to-have — and it is what the style palette is for. A custom style whose output carries the
+  prototype's own class means the editor applying it reproduces the approved markup exactly.
+- **If the palette cannot emit the prototype's markup, you don't get the deviation.** Transcribe it as typed
+  fields instead. A wysiwyg that renders a bare `<a>` where the design has a styled button is drift, and it is
+  the drift this whole reference exists to prevent.
+- **Decide it before the schema, not after.** The palette is site-wide settings; swapping four typed fields for
+  one rich-text field once content is authored means re-authoring every instance.
+
+Load `reference-wysiwyg-config` for the palette, and `practices-conventions-architecture` for the shape
+decision. If `reference-wysiwyg-config` isn't in your manifest, read the site's existing `wysiwyg` settings and
+mirror that shape — do not invent the syntax, and do not silently fall back to typed fields without saying so:
+that choice belongs to whoever approved the design.
+
 ## Verify against the render, not the data
 
 Reading back what you wrote through the CMS proves the content is correct. It proves nothing about the page.
