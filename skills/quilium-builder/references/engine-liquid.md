@@ -184,12 +184,14 @@ run.
 
 - **Media references are arrays of objects** — `[{ "id": "<uuid>" }]` — when written. **Id references are not.**
   `page`, `items` and `smartselect` with `source: items` are written as a flat array of id strings —
-  `["<uuid>"]`. The two shapes are not interchangeable, and on a `page` field the object shape is destructive
-  rather than merely wrong: it stores a corrupt value on create and **silently empties the field on update**,
-  returning 200 either way. `items` self-heals; `page` does not — see `practices-ops-mcp-batching` §5. At
-  render, a page reference is hydrated: `content.custom.myLink[0].url`, `.slug` and `.navTitle` all work. Read
-  the rendered HTML when debugging a link, not the MCP projection, which shows the raw stored form. Images have
-  their own chain of ways to render nothing — see `media.md`.
+  `["<uuid>"]`. Only `image` and `file` take objects, because the server hydrates `name` / `alt` / `url` /
+  `versions` onto them; an id reference stores ids and is hydrated at render. Sending the object shape on an
+  id reference is not fatal — the server reduces it to ids on write and on read — but flat is the contract,
+  and it used to destroy `page` values outright, which is why every guide states it so firmly. See
+  `practices-ops-mcp-batching` §5. At render, a page reference is hydrated:
+  `content.custom.myLink[0].url`, `.slug` and `.navTitle` all work. Read the rendered HTML when debugging a
+  link, not the MCP projection, which shows the raw stored form. Images have their own chain of ways to
+  render nothing — see `media.md`.
 - **`""` is truthy.** Only `nil` and `false` are falsy in Liquid, and Quilium returns unfilled text and url
   fields as `""`, not `nil`. So `{% if content.custom.caption %}` enters the filled branch on an empty field
   and emits `<p></p>` or `<iframe src="">`. Test with `!= blank` when the field is text. Image version URLs are
