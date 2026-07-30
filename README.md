@@ -1,6 +1,10 @@
-# Quilium skills for Claude Code
+# Quilium skills
 
-Two skills that let Claude Code build and run a [Quilium](https://quilium.app) site properly.
+Two agent skills that let a coding agent build and run a [Quilium](https://quilium.app) site properly.
+
+They are plain [SKILL.md](https://skills.sh/) packages — nothing Claude-specific in them. Claude Code and
+Codex are the two we use daily; Cursor, Copilot, Gemini CLI, opencode, Amp, Zed, Windsurf and Cline read the
+same format and are installable in one command (see [Install](#install)).
 
 | Skill | Use it when |
 |---|---|
@@ -32,11 +36,27 @@ restating the rule. A named hazard cannot be wrong; a compressed rule can.
 
 ## Install
 
-Clone anywhere and point Claude Code at it as a plugin, or copy the two directories under `skills/` into
-your project's `.claude/skills/`.
+```bash
+npx skills add quiliumio/quilium-skills
+```
 
-The skills assume the Quilium MCP server is connected. Without it they can still describe the process, but
-they cannot act.
+Installs into the current project, and asks which agents to wire up — each one gets the skills in the
+directory it actually reads (`.claude/skills/`, `.codex/`, and so on). To skip the prompts and target one
+agent explicitly:
+
+```bash
+npx skills add quiliumio/quilium-skills --agent codex --skill '*' -y
+```
+
+`--agent` also takes several agents at once (`--agent claude-code codex`) or `'*'` for all of them; `--all`
+is the shorthand for every skill on every agent. `-g` installs at user level instead of per project, and
+`-l` just lists what's in the repo.
+
+Otherwise: clone anywhere and copy the two directories under `skills/` into whatever directory your agent
+reads. Claude Code can also load the repo directly as a plugin.
+
+The skills assume the Quilium MCP server is connected to the agent. Without it they can still describe the
+process, but they cannot act.
 
 ## Conventions this repo assumes
 
