@@ -1,6 +1,6 @@
 # Quilium skills
 
-Two agent skills that let a coding agent build and run a [Quilium](https://quilium.app) site properly.
+Two agent skills that let a coding agent build and run a [Quilium](https://quilium.io) site properly.
 
 They are plain [SKILL.md](https://skills.sh/) packages — nothing Claude-specific in them. Claude Code and
 Codex are the two we use daily; Cursor, Copilot, Gemini CLI, opencode, Amp, Zed, Windsurf and Cline read the
