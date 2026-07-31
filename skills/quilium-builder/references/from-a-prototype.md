@@ -52,6 +52,9 @@ Two rules that catch most of the drift:
 - **Use the exact field names from your schema.** Templates and content are usually written at different
   moments — sometimes by different agents. A template reading `subtitle` where the content wrote `subline`
   renders empty and reports nothing.
+- **The prototype's language stops at the labels.** A French mockup naming a block *Nos services* gives a
+  content-type keyed `services` with fields `title` and `intro` — English `camelCase`, like every other key on
+  the site. Transcription applies to the markup and the copy, not to the identifiers.
 
 ### The one licensed deviation: collapsing markup into rich text
 

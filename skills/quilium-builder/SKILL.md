@@ -119,6 +119,13 @@ These aren't preferences. Each one, broken, produces a failure that looks like s
 - **Templates are `.liquid`**, full path always (`elements/hero.liquid`, never `hero.liquid`). It is the only
   loadable extension: any other value in a `template:` is ENOENT → **500**, never a fallback. That covers mail
   bodies too (`sendmail`'s `config.template`). A value with no extension does resolve — `.liquid` is appended.
+- **Every key you write in YAML is English `camelCase`.** Types, fields, tabsets, ItemSets, `select` option
+  values, image versions, routes — the identifiers, all of them, whatever language the site or the client
+  speaks. Only the editor-facing strings (`label:` and friends) follow the site's language. Keys are code: a
+  template reaches them by dot access, so `titre-principal` or `libellé` stops being reachable as
+  `page.custom.<field>` — a hyphen parses as a minus, an accent isn't a word character — and you're into
+  bracket lookups, when it works at all. Mixed languages cost more slowly: `articles` next to `evenements`,
+  and every template read after that is a guess.
 - **Never write a URL path or a page UUID in a template.** Both are CMS identifiers; a template that hardcodes
   one breaks the day a slug is translated or a locale is added. The indirection is a **named route**, consumed
   as `{{ 'routename' | url }}`. See `references/engine-liquid.md`.
@@ -151,7 +158,7 @@ skill that isn't coming.
 | Decide the shape of a feature | `practices-conventions-architecture` | ask the wysiwyg question first: a bullet list or a paragraph-with-CTA is one field, not a `repeat` |
 | Give the editor rich text that matches the design | `reference-wysiwyg-config` | read the site's existing `wysiwyg` settings and mirror that shape — never invent the palette syntax |
 | Choose a field type | `reference-fields-catalog` | probe one in the back-office before committing a schema to it |
-| Name anything | `practices-conventions-naming` | camelCase keys, consistent site-wide, full template path, `.liquid` |
+| Name anything | `practices-conventions-naming` | English camelCase keys, consistent site-wide, full template path, `.liquid` |
 | Design the editor's experience | `practices-conventions-cms-ux` | — |
 | Write a template | — | `references/engine-liquid.md` |
 | Wire a listing and its detail pages | — | `references/detail-pages.md` |

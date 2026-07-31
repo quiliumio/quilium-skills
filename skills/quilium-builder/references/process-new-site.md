@@ -57,7 +57,15 @@ content was split across typed fields.
 
 ## Step 2 — the CMS base
 
-Write the schemas, then the pages, then the routes. Within this step the order is:
+Write the schemas, then the pages, then the routes.
+
+Before the first key: **every identifier in this YAML is English `camelCase`** — type keys, field keys,
+tabsets, `select` option values, image versions, route names. The site's language lives in the labels, never
+in the keys. This is the cheapest rule in the project to follow now and the most expensive to retrofit: keys
+are what templates address by dot access, so renaming one later means touching every template that reads it
+*and* migrating the content already stored under the old key.
+
+Within this step the order is:
 
 **0 · the wysiwyg style palette** — write it before the schemas that assume it. Every variant it carries is a
 field the content-types below don't declare, so writing it first is what keeps step 1's decisions from quietly
