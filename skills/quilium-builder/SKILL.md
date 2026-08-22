@@ -126,6 +126,13 @@ These aren't preferences. Each one, broken, produces a failure that looks like s
   `page.custom.<field>` — a hyphen parses as a minus, an accent isn't a word character — and you're into
   bracket lookups, when it works at all. Mixed languages cost more slowly: `articles` next to `evenements`,
   and every template read after that is a guess.
+- **YAML is block style, always.** Indented mappings, 2 spaces, one key per line — the way every example in
+  the docs is written. Never flow/JSON-like mappings (`col1: { name: Horaires, width: 50 }`): the parser takes
+  them, the webdesigner who maintains the file by hand does not. Form layout lives INSIDE a tabset:
+  `tabsets.<tab>.fieldsets.<key>` with an optional `name` (the heading shown above the group — a fieldset
+  without `name` is a bare column) and a `width` from 25/30/33/40/50/60/66/70/75/100; a field only carries
+  `fieldset: <key>`. Group what is read together and name the groups that mean something (« Horaires »,
+  « Lieu », « Publication ») — never after the single field they hold.
 - **Never write a URL path or a page UUID in a template.** Both are CMS identifiers; a template that hardcodes
   one breaks the day a slug is translated or a locale is added. The indirection is a **named route**, consumed
   as `{{ 'routename' | url }}`. See `references/engine-liquid.md`.
