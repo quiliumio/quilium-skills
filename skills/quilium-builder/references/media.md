@@ -88,3 +88,36 @@ alt="{% if img.alt != blank %}{{ img.alt }}{% else %}{{ content.custom.title }}{
   fails the same silent way.
 - Remember Liquid truthiness: `""` is **truthy**. `{% if content.custom.caption %}` enters the filled branch on
   an empty text field and emits empty wrappers. Grep for `<p></p>`, `<h2></h2>` and `<iframe src="">` too.
+
+## Lifecycle — retention and `onDelete`
+
+A collection with `retention` deletes its items automatically (trash, then purge 30 days later).
+What happens to the media its items reference is decided **per field**, with `config.onDelete` on
+`image`/`file` fields:
+
+```yaml
+retention:
+  duration: P0D          # delete as soon as the date is passed
+  basedOn: displayUntil  # a `date` field of the type — empty date = never expires
+tabsets:
+  main:
+    fields:
+      displayUntil:
+        type: date
+      document:
+        type: file
+        config:
+          onDelete: cascade   # media follows the item to the media trash
+      photo:
+        type: image
+        config:
+          onDelete: orphan    # only if nothing else references it
+          versions:
+            card:
+              width: 800
+```
+
+`keep` (the default) never touches the media — the right choice for reusable images (logos,
+photos). `cascade` is for disposable documents owned by the item. `orphan` checks the media's other
+references at purge time. Rules apply at the item's **hard delete** (trash purge), so restoring an
+item from the trash restores it with its media intact.
