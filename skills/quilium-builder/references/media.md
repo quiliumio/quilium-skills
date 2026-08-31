@@ -97,7 +97,7 @@ What happens to the media its items reference is decided **per field**, with `co
 
 ```yaml
 retention:
-  duration: P0D          # delete as soon as the date is passed
+  duration: P0D          # deleted at the END of the basedOn day (inclusive)
   basedOn: displayUntil  # a `date` field of the type — empty date = never expires
 tabsets:
   main:
