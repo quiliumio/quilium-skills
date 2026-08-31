@@ -1,6 +1,6 @@
 ---
 name: quilium-webmaster
-description: Load when operating a Quilium CMS site that already runs — writing or editing content blocks, managing pages, uploading media, adding items to a collection, translating, reordering navigation, auditing or filling SEO metadata, importing from a file. Covers the working discipline of a content session and the mistakes that corrupt data without raising an error. Triggers on "add a page", "edit this block", "upload an image", "add an article", "translate this", "publish this", "fill the meta descriptions", "import this spreadsheet", "reorder the menu". For structural work — YAML types, routes, templates, a site that doesn't exist yet — use quilium-builder instead.
+description: Load when operating a Quilium CMS site that already runs — writing or editing content blocks, managing pages, uploading media, adding items to a collection, translating, reordering navigation, auditing or filling SEO metadata, importing from a file. Covers the working discipline of a content session and the mistakes that corrupt data without raising an error. Triggers on "add a page", "edit this block", "add a field to the form", "change the form validation", "the form email", "upload an image", "add an article", "translate this", "publish this", "fill the meta descriptions", "import this spreadsheet", "reorder the menu". For structural work — YAML types, routes, templates, a site that doesn't exist yet — use quilium-builder instead.
 ---
 
 # Quilium webmaster
@@ -44,6 +44,12 @@ a compressed rule is how you get a confident, wrong answer. Load the skill.
 The translations one deserves the emphasis: the rule for `update-content` / `update-page` is the **opposite**
 of the rule for `update-itemset-item`. Getting it backwards on collection items produces undefined behaviour,
 not an error. Read §6 every time until it's automatic.
+
+A seventh, specific to `customform` blocks and not covered by the library at all: **a
+validation rule whose key doesn't match an input's `name=`** fails on every submission
+while highlighting nothing. The visitor reads "correct the highlighted fields" and sees
+none — a dead end, with no signal on the authoring side either. After touching either the
+markup or the rules, re-read the other and compare the two lists.
 
 One rule that isn't a hazard, just a habit: **upload originals**. Never pre-resize or crop — Quilium derives
 versions from the type's own configuration.
@@ -96,10 +102,28 @@ you're entitled to do.
 | Find broken links | `tasks-seo-find-broken-links` |
 | Reorder or re-parent the menu | `reference-navigation` |
 | Embed a video or a widget | `tasks-content-html-embed` |
+| Write or change a **customform** — its markup, its rules, its emails | `references/customform-html.md`, `-validation.md`, `-emails.md` |
 | A large authoring session | `processes-content-ops-bulk-authoring` |
 | Anything over a handful of calls | `practices-ops-mcp-batching` |
 
 Load fresh — slugs evolve, and the descriptions are the source of truth.
+
+## The one procedure this skill does carry
+
+`customform` blocks — the ones whose HTML, validation rules and email bodies all live in
+the content. The MCP library covers no part of them, and improvising the placeholder
+vocabulary produces a form that renders but never validates. So the three references are
+here, in full:
+
+| File | Covers |
+|---|---|
+| `references/customform-html.md` | the `{{q:...}}` vocabulary, matching the client's design system, conditional display |
+| `references/customform-validation.md` | the validation YAML — validators, conditional rules, messages |
+| `references/customform-emails.md` | email bodies, per-instance settings, the two guards that silently block a send |
+
+Recognise a customform by its content-type: it exposes a field of `type: formvalidate`.
+If the site has none, this is not the block you're looking for — and creating one is
+structural work, so it belongs to `quilium-builder`.
 
 ## What this skill is not
 
