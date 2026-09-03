@@ -117,7 +117,7 @@ here, in full:
 
 | File | Covers |
 |---|---|
-| `references/customform-html.md` | the `{{q:...}}` vocabulary, matching the client's design system, conditional display |
+| `references/customform-html.md` | the `{{_field.…}}` / `{{_form.…}}` vocabulary, matching the client's design system, conditional display |
 | `references/customform-validation.md` | the validation YAML — validators, conditional rules, messages |
 | `references/customform-emails.md` | email bodies, per-instance settings, the two guards that silently block a send |
 

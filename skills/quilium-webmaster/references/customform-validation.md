@@ -24,7 +24,7 @@ rules:            # obligatoire
   _hp:
     - honeypot                    # forme courte : réservée aux validateurs sans message
 
-labels:           # facultatif — libellés lisibles, utilisés par {{q:fields}} et {{q:label}}
+labels:           # facultatif — libellés lisibles, utilisés par {{_form.fields}} et {{_field.<champ>.label}}
   email: "Adresse email"
   message: "Message"
 
@@ -140,12 +140,12 @@ sinon la règle échoue à chaque fois.
 
 ```html
 <div aria-hidden="true" class="absolute -left-[9999px]">
-  <input type="text" name="_hp" tabindex="-1" autocomplete="off" value="{{q:value:_hp}}">
+  <input type="text" name="_hp" tabindex="-1" autocomplete="off" value="{{_field._hp.value}}">
 </div>
 ```
 
 Laisse leur `message` vide — c'est d'ailleurs le seul cas où le save l'accepte.
-`{{q:errors}}` masque les champs pièges en se fondant sur **le validateur**, pas sur le
+`{{_form.errors}}` masque les champs pièges en se fondant sur **le validateur**, pas sur le
 message, donc le piège n'apparaît jamais au visiteur.
 
 ### reCAPTCHA
@@ -158,7 +158,7 @@ message, donc le piège n'apparaît jamais au visiteur.
 
 À prévoir systématiquement dès que le formulaire envoie un email : **sans reCAPTCHA validé
 et sans SMTP personnalisé, aucun mail ne part**, en silence. Ajoute aussi
-`{{q:recaptcha}}` dans le HTML, sinon le visiteur n'a rien à cocher et ne peut jamais
+`{{_form.recaptcha}}` dans le HTML, sinon le visiteur n'a rien à cocher et ne peut jamais
 soumettre.
 
 ## `labels`
@@ -169,7 +169,7 @@ labels:
   email: "Adresse email"
 ```
 
-Sert à `{{q:fields}}` (le tableau récapitulatif des emails) et à `{{q:label:champ}}`. Sans
+Sert à `{{_form.fields}}` (le tableau récapitulatif des emails) et à `{{_field.champ.label}}`. Sans
 libellé, la clé brute s'affiche — un email listant `prenom` plutôt que « Prénom » fait
 négligé. L'ordre des clés **impose aussi l'ordre des lignes** du tableau.
 
@@ -194,7 +194,7 @@ visiteur.
 
 ## `success`, `error`
 
-`success` s'affiche via `{{q:messages}}` **après la redirection** qui suit une soumission
+`success` s'affiche via `{{_form.messages}}` **après la redirection** qui suit une soumission
 valide. `error` s'affiche immédiatement sur la page re-rendue en cas d'échec.
 
 Laisser `success` vide n'est pas neutre : le visiteur voit alors son formulaire se vider
@@ -338,7 +338,7 @@ langue) : il contient des libellés, des légendes et le texte du bouton.
 listes.
 
 **Un champ devient rouge sans message** → sa règle n'a pas de `message`. Le résumé
-`{{q:errors}}` retombe alors sur le libellé du champ, mais le visiteur n'apprend pas ce
+`{{_form.errors}}` retombe alors sur le libellé du champ, mais le visiteur n'apprend pas ce
 qu'on attend de lui.
 
 **Toutes les branches échouent sur un champ conditionnel** → il est déclaré `required` au
@@ -347,5 +347,5 @@ lieu de `required_if`.
 **Aucune règle ne s'applique, aucune erreur ne s'affiche** → le YAML stocké est invalide et
 la validation a été neutralisée. Ré-enregistre le bloc : le 422 te dira quoi corriger.
 
-**Le message de succès ne s'affiche pas** → `success` est vide, ou `{{q:messages}}` est
+**Le message de succès ne s'affiche pas** → `success` est vide, ou `{{_form.messages}}` est
 absent du HTML.

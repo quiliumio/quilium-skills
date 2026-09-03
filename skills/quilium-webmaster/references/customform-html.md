@@ -1,4 +1,4 @@
-# Les placeholders `{{q:...}}` — référence exhaustive
+# Les placeholders `{{_field.…}}` / `{{_form.…}}` — référence exhaustive
 
 Le HTML stocké dans le champ `formHtml` n'est **pas** compilé par Liquid ou Nunjucks —
 le faire donnerait à n'importe quel éditeur du CMS l'exécution de template côté serveur.
@@ -12,8 +12,8 @@ Conséquences directes, à garder en tête tout du long :
   règle des guillemets ci-dessous ;
 - un placeholder inconnu rend une chaîne **vide** (il ne s'affiche pas tel quel), donc une
   faute de frappe se traduit par un trou silencieux — relis tes noms de champs ;
-- les `{{ ... }}` **sans** le préfixe `q:` sont laissés intacts : ton JS inline peut
-  contenir des accolades sans risque.
+- les `{{ ... }}` qui ne commencent **pas** par `_field`, `_form`, `_page`, `_now` ou
+  `_request` sont laissés intacts : ton JS inline peut contenir des accolades sans risque.
 
 ## Toujours guillemeter les attributs
 
@@ -21,18 +21,18 @@ L'échappement couvre les cinq entités qui rendent une valeur sûre dans du con
 dans un attribut guillemeté** — simple ou double, au choix. Il ne peut pas couvrir un
 attribut **non** guillemeté, et ce n'est pas un manque à combler : le moteur ne voit
 qu'une chaîne, il ne sait pas si un placeholder atterrit dans un attribut ou dans du
-texte. Échapper l'espace et le `=` par précaution rendrait `{{q:error:email}}` dans un
+texte. Échapper l'espace et le `=` par précaution rendrait `{{_field.email.error}}` dans un
 `<p>` comme `Cette&#32;adresse&#32;email…`.
 
 D'où une règle d'écriture, pas une option :
 
 ```html
 <!-- OUI -->
-<input name="email" value="{{q:value:email}}">
-<input name="email" value='{{q:value:email}}'>
+<input name="email" value="{{_field.email.value}}">
+<input name="email" value='{{_field.email.value}}'>
 
 <!-- NON — une valeur postée peut ouvrir un attribut à elle -->
-<input name="email" value={{q:value:email}}>
+<input name="email" value={{_field.email.value}}>
 ```
 
 Sans guillemets, une valeur comme `a onmouseover=alert(1)` devient un attribut à part
@@ -74,18 +74,18 @@ Les 17 placeholders, exhaustivement.
 
 | Placeholder | Rend |
 |---|---|
-| `{{q:action}}` | l'URL courante (chemin + querystring) — à mettre dans `action=""` |
-| `{{q:formid}}` | `<input type="hidden" name="form" value="…">` |
-| `{{q:csrf}}` | `<input type="hidden" name="_csrf" value="…">`, vide si aucune règle `csrf` |
-| `{{q:recaptcha}}` | le widget reCAPTCHA + son script, vide si aucune règle `recaptcha` |
+| `{{_form.action}}` | l'URL courante (chemin + querystring) — à mettre dans `action=""` |
+| `{{_form.id}}` | `<input type="hidden" name="form" value="…">` |
+| `{{_form.csrf}}` | `<input type="hidden" name="_csrf" value="…">`, vide si aucune règle `csrf` |
+| `{{_form.recaptcha}}` | le widget reCAPTCHA + son script, vide si aucune règle `recaptcha` |
 
-**`{{q:formid}}` est obligatoire, écris-le toujours** en première ligne du `<form>`, suivi
-de `{{q:csrf}}` :
+**`{{_form.id}}` est obligatoire, écris-le toujours** en première ligne du `<form>`, suivi
+de `{{_form.csrf}}` :
 
 ```html
-<form method="post" action="{{q:action}}">
-  {{q:formid}}
-  {{q:csrf}}
+<form method="post" action="{{_form.action}}">
+  {{_form.id}}
+  {{_form.csrf}}
 ```
 
 Rien ne l'injecte à ta place. Sans lui, la soumission n'identifie aucun bloc : **aucune
@@ -97,47 +97,48 @@ a l'air de fonctionner et ne valide rien.
 
 | Placeholder | Rend |
 |---|---|
-| `{{q:value:champ}}` | la valeur postée, échappée — pour `value=""` ou le contenu d'un `<textarea>` |
-| `{{q:checked:champ:valeur}}` | `checked` si le champ vaut cette valeur, sinon vide |
-| `{{q:checked:champ}}` | `checked` si le champ a été posté, quelle que soit sa valeur |
-| `{{q:selected:champ:valeur}}` | `selected`, même logique — pour les `<option>` |
+| `{{_field.champ.value}}` | la valeur postée, échappée — pour `value=""` ou le contenu d'un `<textarea>` |
+| `{{_field.champ.checked.valeur}}` | `checked` si le champ vaut cette valeur, sinon vide |
+| `{{_field.champ.checked}}` | `checked` si le champ a été posté, quelle que soit sa valeur |
+| `{{_field.champ.selected.valeur}}` | `selected`, même logique — pour les `<option>` |
 
 Un champ multi-valeurs (groupe de cases, `select multiple`) est reconnu :
-`{{q:checked:options:pro}}` coche si `pro` fait partie des valeurs envoyées.
+`{{_field.options.checked.pro}}` coche si `pro` fait partie des valeurs envoyées.
 
 **La forme sans valeur est faite pour la case à cocher unique.** Une case sans attribut
 `value` est postée par le navigateur avec la valeur `on`, un nom que tu n'as écrit nulle
 part et que tu ne peux donc pas comparer :
 
 ```html
-<input type="checkbox" name="consentement" {{q:checked:consentement}}>
+<input type="checkbox" name="consentement" {{_field.consentement.checked}}>
 ```
 
 Avec une valeur explicite, garde la forme complète — elle compare littéralement.
 
 La recherche se fait sur la **clé postée littérale**. Un champ nommé `address.city` se lit
-`{{q:value:address.city}}` — il n'y a pas de navigation dans un objet.
+`{{_field.address.city.value}}` — il n'y a pas de navigation dans un objet.
 
 ### Erreurs
 
 | Placeholder | Rend |
 |---|---|
-| `{{q:error:champ}}` | le premier message d'erreur du champ, vide s'il n'y en a pas |
-| `{{q:haserror:champ:<classes>}}` | les classes fournies si le champ est en erreur, sinon vide |
-| `{{q:invalid:champ}}` | `true` ou `false` — pour `aria-invalid` |
-| `{{q:errors}}` | la liste de **toutes** les erreurs du formulaire |
-| `{{q:haserrors:<classes>}}` | les classes si le formulaire a au moins une erreur |
-| `{{q:messages}}` | le message global de succès ou d'échec |
+| `{{_field.champ.error}}` | le premier message d'erreur du champ, vide s'il n'y en a pas |
+| `{{_field.champ.class}}` | `q-field--error` si le champ est en erreur, sinon vide |
+| `{{_field.champ.invalid}}` | `true` ou `false` — pour `aria-invalid` |
+| `{{_form.errors}}` | la liste de **toutes** les erreurs du formulaire |
+| `{{_form.class}}` | `q-form--error` si le formulaire a au moins une erreur |
+| `{{_form.messages}}` | le message global de succès ou d'échec |
 
-`{{q:haserror}}` et `{{q:haserrors}}` acceptent les classes en argument. Sans argument,
-ils retombent sur `is-invalid` — un nom Bootstrap qui ne signifie probablement rien sur le
-site que tu traites. Fournis toujours les classes du thème.
+`{{_field.champ.class}}` et `{{_form.class}}` **ne prennent aucun argument** : ils posent
+les classes du contrat Quilium, `q-field--error` et `q-form--error`. C'est l'intégrateur
+du site qui les stylise dans sa feuille de style — n'écris jamais de classes de thème dans
+le HTML du formulaire.
 
-`{{q:errors}}` produit un balisage à classes fixes, que tu styles en CSS :
+`{{_form.errors}}` produit un balisage à classes fixes, que tu styles en CSS :
 
 ```html
-<ul class="q-form-errors" role="alert">
-  <li class="q-form-error" data-field="email">Cette adresse email n'est pas valide.</li>
+<ul class="q-form__errors" role="alert">
+  <li class="q-form__error" data-field="email">Cette adresse email n'est pas valide.</li>
 </ul>
 ```
 
@@ -147,12 +148,12 @@ un vrai champ dont la règle n'a pas de message reste listé, avec son libellé 
 phrase. C'est volontaire — un champ en erreur qui disparaît du résumé est précisément
 l'impasse que ce résumé existe pour éviter.
 
-`{{q:haserrors}}` applique **le même critère**. Une soumission qui ne rate que le piège —
+`{{_form.class}}` applique **le même critère**. Une soumission qui ne rate que le piège —
 un bot, ou un gestionnaire de mots de passe qui remplit le champ caché — ne marque donc
 pas le formulaire en erreur : sinon le visiteur verrait la classe d'erreur avec un résumé
 vide, et rien à corriger.
 
-`{{q:messages}}` produit :
+`{{_form.messages}}` produit :
 
 ```html
 <div class="q-form-messages">
@@ -162,18 +163,18 @@ vide, et rien à corriger.
 
 La classe finale vaut `--success` ou `--error` selon l'issue. Après une soumission
 valide le visiteur est redirigé, et c'est au chargement suivant que le message de succès
-apparaît — d'où l'intérêt de laisser `{{q:messages}}` dans le formulaire lui-même.
+apparaît — d'où l'intérêt de laisser `{{_form.messages}}` dans le formulaire lui-même.
 
 ### Libellés et contexte
 
 | Placeholder | Rend |
 |---|---|
-| `{{q:label:champ}}` | le libellé déclaré dans `labels:`, sinon la clé du champ |
-| `{{q:fields}}` | un tableau de tous les champs soumis — surtout utile dans un email |
-| `{{q:page}}` | l'URL absolue de la page |
-| `{{q:date}}` | la date et l'heure de soumission (`JJ/MM/AAAA HH:MM`) |
+| `{{_field.champ.label}}` | le libellé déclaré dans `labels:`, sinon la clé du champ |
+| `{{_form.fields}}` | un tableau de tous les champs soumis — surtout utile dans un email |
+| `{{_page.url}}` | l'URL absolue de la page |
+| `{{_now}}` | la date et l'heure de soumission (`JJ/MM/AAAA HH:MM`) |
 
-`{{q:fields}}` et `{{q:label:…}}` servent essentiellement aux corps d'emails ; dans le
+`{{_form.fields}}` et `{{_field.….label}}` servent essentiellement aux corps d'emails ; dans le
 formulaire tu écris les libellés directement dans le markup. Voir `emails.md`.
 
 ## Ce que l'interpolateur fait pour toi
@@ -238,7 +239,7 @@ n'est pas envoyé du tout — ce qui est exactement ce qu'attend `required_if`, 
 JavaScript, tout s'affiche et le formulaire reste utilisable. La validation serveur, elle,
 ne dépend jamais du JavaScript.
 
-**`{{q:checked:…}}` recoche la branche choisie** après une erreur, donc `refresh()` rouvre
+**`{{_field.….checked}}` recoche la branche choisie** après une erreur, donc `refresh()` rouvre
 le bon bloc tout seul et le visiteur ne perd pas son contexte.
 
 **La validation serveur doit suivre** : un champ de branche déclaré simplement `required`
@@ -256,10 +257,10 @@ Cinq éléments, tous nécessaires. Répète-le pour **chaque** champ, sans en s
 <div>
   <label for="cf-email" class="<classes de label du thème>">Email *</label>
   <input type="email" id="cf-email" name="email"
-         value="{{q:value:email}}"
-         aria-invalid="{{q:invalid:email}}" aria-describedby="cf-email-err"
-         class="<classes d'input du thème> {{q:haserror:email:<classes d'erreur du thème>}}">
-  <span id="cf-email-err" role="alert" class="<classe de message d'erreur du thème>">{{q:error:email}}</span>
+         value="{{_field.email.value}}"
+         aria-invalid="{{_field.email.invalid}}" aria-describedby="cf-email-err"
+         class="<classes d'input du thème> {{_field.email.class}}">
+  <span id="cf-email-err" role="alert" class="<classe de message d'erreur du thème>">{{_field.email.error}}</span>
 </div>
 ```
 
@@ -268,13 +269,13 @@ l'accessibilité · la classe conditionnelle **sur l'input** · le message.
 
 Trois erreurs récurrentes, toutes vues en conditions réelles :
 
-- **`{{q:haserror}}` posé sur le `<div>` parent** au lieu de l'input : le conteneur change
+- **`{{_field.champ.class}}` posé sur le `<div>` parent** au lieu de l'input : le conteneur change
   d'état, le champ reste visuellement normal. Seule exception légitime : une **case à
   cocher**, où une bordure rouge n'aurait pas de sens — l'état va sur son conteneur.
 - **n'en mettre que sur certains champs** : on soigne les champs principaux et on oublie
   les champs conditionnels, qui sont justement ceux qui échoueront.
-- **`{{q:invalid}}` confondu avec `{{q:haserror}}`** : le premier rend `true`/`false`, le
-  second un nom de classe. Ne mets pas `{{q:haserror}}` dans un `aria-invalid`.
+- **`{{_field.champ.invalid}}` confondu avec `{{_field.champ.class}}`** : le premier rend
+  `true`/`false`, le second un nom de classe. Ne mets pas `.class` dans un `aria-invalid`.
 
 ## Une limite à connaître
 

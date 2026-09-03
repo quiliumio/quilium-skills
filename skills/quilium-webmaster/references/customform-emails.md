@@ -46,7 +46,7 @@ update-content
 
 Dans `to`, `subject` et `replyTo`, les champs postés s'interpolent avec des accolades
 **sans espaces** : `{{prenom}}`, jamais `{{ prenom }}`. Ces trois valeurs passent par un
-mécanisme différent des placeholders `q:`, plus strict. Une accolade espacée reste
+mécanisme différent des placeholders `_field` / `_form`, plus strict. Une accolade espacée reste
 affichée telle quelle dans l'objet du mail.
 
 L'expéditeur (`From`) n'est pas modifiable par instance : il vaut l'expéditeur Quilium du
@@ -59,11 +59,11 @@ Le corps utilise **le même vocabulaire que le formulaire** — rien de nouveau 
 Le plus robuste, et le défaut recommandé :
 
 ```html
-<p>Nouvelle demande reçue depuis {{q:page}} le {{q:date}}.</p>
-{{q:fields}}
+<p>Nouvelle demande reçue depuis {{_page.url}} le {{_now}}.</p>
+{{_form.fields}}
 ```
 
-`{{q:fields}}` produit un tableau de tous les champs soumis. Son intérêt : le mail reste
+`{{_form.fields}}` produit un tableau de tous les champs soumis. Son intérêt : le mail reste
 exhaustif **quand un champ est ajouté au formulaire**, sans que personne ne touche au
 corps ni au template.
 
@@ -91,12 +91,12 @@ L'ordre des lignes suit l'ordre de `labels:`, puis l'ordre de soumission pour le
 Pour un accusé de réception, une rédaction sur mesure passe mieux :
 
 ```html
-<p>Bonjour {{q:value:prenom}},</p>
+<p>Bonjour {{_field.prenom.value}},</p>
 <p>Nous avons bien reçu votre message et vous répondrons rapidement.</p>
-{{q:fields}}
+{{_form.fields}}
 ```
 
-Les placeholders propres au formulaire (`{{q:csrf}}`, `{{q:error:…}}`, `{{q:messages}}`)
+Les placeholders propres au formulaire (`{{_form.csrf}}`, `{{_field.….error}}`, `{{_form.messages}}`)
 rendent une chaîne vide dans un mail — inoffensifs, mais inutiles.
 
 ## Les deux gardes qui bloquent un envoi
@@ -110,7 +110,7 @@ Hors SMTP personnalisé, `sendmail` exige que reCAPTCHA ait été validé. Sans 
 fonction sort en silence.
 
 **À faire systématiquement** : la règle `g-recaptcha-response: [recaptcha]` dans le YAML,
-et `{{q:recaptcha}}` dans le HTML.
+et `{{_form.recaptcha}}` dans le HTML.
 
 Le contournement local (`NODE_ENV=local`) fait passer l'envoi en développement — donc un
 test local ne prouve rien sur ce point.
@@ -141,7 +141,7 @@ jamais en production. Là encore, le contournement local masque le problème.
 **Le mail admin part, pas celui du visiteur** → Cleantalk n'est pas configuré (clé
 manquante, ou `meta` absent).
 
-**Le tableau `{{q:fields}}` est vide** → le moteur qui rend les mails n'est pas à jour ; ou
+**Le tableau `{{_form.fields}}` est vide** → le moteur qui rend les mails n'est pas à jour ; ou
 le corps a été écrit dans le mauvais champ.
 
 **Les libellés affichent les clés brutes** → `labels:` manque dans le YAML de validation.
