@@ -264,7 +264,8 @@ rules:
     - validate: required
       message: "Le nom est obligatoire."
   email:
-    - required
+    - validate: required
+      message: "Merci d'indiquer votre adresse email."
     - validate: email
       message: "Cette adresse email n'est pas valide."
   message:
@@ -295,6 +296,41 @@ meta:
 success: "Merci, votre demande a bien été envoyée."
 error: "Merci de corriger les champs signalés."
 ```
+
+## Sites multilingues
+
+N'écris **qu'un seul** bloc `validation`, en langue par défaut. Ne le duplique
+jamais par langue : les règles (`required_if`, les limites de fichier, les
+conditions) n'ont pas de langue, et les recopier oblige à les corriger dans
+chaque locale.
+
+La traduction se fait au rendu : le template passe chaque message par le filtre
+`t`, donc par le **dictionnaire** du site. Le texte que tu écris dans `message`
+devient la clé du dictionnaire.
+
+```yaml
+rules:
+  email:
+    - validate: required
+      message: "Merci d'indiquer votre adresse email."   # <- clé du dictionnaire
+```
+
+Puis, dans le Dictionnaire du site, une entrée par langue :
+
+| Clé | en | de |
+|---|---|---|
+| `Merci d'indiquer votre adresse email.` | Please enter your email address. | Bitte geben Sie Ihre E-Mail-Adresse ein. |
+
+Trois conséquences :
+
+- **Un site monolingue n'a rien à faire.** Sans entrée au dictionnaire, le
+  message s'affiche tel quel.
+- **Le texte est la clé.** Corriger une faute de frappe dans `message` casse ses
+  traductions — il faut alors mettre à jour l'entrée du dictionnaire aussi.
+- **Vaut aussi pour `success` et `error`**, qui passent par le même filtre.
+
+Le HTML, lui, se traduit par le mécanisme habituel du contenu (une version par
+langue) : il contient des libellés, des légendes et le texte du bouton.
 
 ## Diagnostiquer
 
