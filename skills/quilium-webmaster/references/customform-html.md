@@ -79,12 +79,19 @@ Les 17 placeholders, exhaustivement.
 | `{{q:csrf}}` | `<input type="hidden" name="_csrf" value="…">`, vide si aucune règle `csrf` |
 | `{{q:recaptcha}}` | le widget reCAPTCHA + son script, vide si aucune règle `recaptcha` |
 
-`{{q:formid}}` et `{{q:csrf}}` sont **injectés automatiquement** juste après la balise
-`<form>` si tu les oublies. Les écrire explicitement reste plus lisible, et l'injection
-ne se déclenche alors pas — pas de doublon.
+**`{{q:formid}}` est obligatoire, écris-le toujours** en première ligne du `<form>`, suivi
+de `{{q:csrf}}` :
 
-Le hidden `form` n'est pas décoratif : sans lui, une soumission déclenche les actions de
-**tous** les blocs de la page, pas seulement du tien.
+```html
+<form method="post" action="{{q:action}}">
+  {{q:formid}}
+  {{q:csrf}}
+```
+
+Rien ne l'injecte à ta place. Sans lui, la soumission n'identifie aucun bloc : **aucune
+validation ne se déclenche**, aucune erreur ne s'affiche, et selon la page les actions
+d'autres blocs peuvent partir à la place. L'échec est totalement silencieux — le formulaire
+a l'air de fonctionner et ne valide rien.
 
 ### Valeurs saisies
 
