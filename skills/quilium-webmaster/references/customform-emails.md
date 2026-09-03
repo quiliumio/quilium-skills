@@ -74,9 +74,13 @@ corps ni au template.
 </table>
 ```
 
-Il exclut d'office la plomberie (`form`, `_csrf`, `g-recaptcha-response`, `id`,
-`update_*`) et les champs pièges déclarés `honeypot` ou `empty`. Les champs vides sont
-omis pour que le mail reste lisible.
+Il exclut d'office la plomberie (`form`, `_csrf`, `g-recaptcha-response`, `update_*`) et
+les champs pièges déclarés `honeypot` ou `empty`. Les champs vides sont omis pour que le
+mail reste lisible.
+
+Un champ nommé `id` **n'est pas** exclu : c'est plus souvent une référence métier (numéro
+de commande, numéro de dossier) qu'une clé technique, et le perdre du mail de notification
+sans trace coûte plus cher que de l'afficher.
 
 Les libellés viennent de `labels:` dans le YAML de validation. Sans eux, les clés brutes
 s'affichent (`prenom` au lieu de « Prénom ») — c'est le premier reproche qu'on fait à un

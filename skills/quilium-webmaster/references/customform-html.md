@@ -8,11 +8,36 @@ Conséquences directes, à garder en tête tout du long :
 
 - pas de boucle, pas de condition, pas d'expression — ce qui n'est pas dans le tableau
   ci-dessous n'existe pas ;
-- tout ce qui vient du visiteur est **échappé automatiquement**, tu ne peux pas oublier ;
+- tout ce qui vient du visiteur est **échappé automatiquement** — à une condition, la
+  règle des guillemets ci-dessous ;
 - un placeholder inconnu rend une chaîne **vide** (il ne s'affiche pas tel quel), donc une
   faute de frappe se traduit par un trou silencieux — relis tes noms de champs ;
 - les `{{ ... }}` **sans** le préfixe `q:` sont laissés intacts : ton JS inline peut
   contenir des accolades sans risque.
+
+## Toujours guillemeter les attributs
+
+L'échappement couvre les cinq entités qui rendent une valeur sûre dans du contenu **et
+dans un attribut guillemeté** — simple ou double, au choix. Il ne peut pas couvrir un
+attribut **non** guillemeté, et ce n'est pas un manque à combler : le moteur ne voit
+qu'une chaîne, il ne sait pas si un placeholder atterrit dans un attribut ou dans du
+texte. Échapper l'espace et le `=` par précaution rendrait `{{q:error:email}}` dans un
+`<p>` comme `Cette&#32;adresse&#32;email…`.
+
+D'où une règle d'écriture, pas une option :
+
+```html
+<!-- OUI -->
+<input name="email" value="{{q:value:email}}">
+<input name="email" value='{{q:value:email}}'>
+
+<!-- NON — une valeur postée peut ouvrir un attribut à elle -->
+<input name="email" value={{q:value:email}}>
+```
+
+Sans guillemets, une valeur comme `a onmouseover=alert(1)` devient un attribut à part
+entière. Guillemète **tous** tes attributs, sans exception : c'est de toute façon la
+convention HTML, et ici c'est ce qui tient la promesse d'échappement.
 
 ## Les classes viennent du site, pas d'ici
 
@@ -67,10 +92,21 @@ Le hidden `form` n'est pas décoratif : sans lui, une soumission déclenche les 
 |---|---|
 | `{{q:value:champ}}` | la valeur postée, échappée — pour `value=""` ou le contenu d'un `<textarea>` |
 | `{{q:checked:champ:valeur}}` | `checked` si le champ vaut cette valeur, sinon vide |
+| `{{q:checked:champ}}` | `checked` si le champ a été posté, quelle que soit sa valeur |
 | `{{q:selected:champ:valeur}}` | `selected`, même logique — pour les `<option>` |
 
 Un champ multi-valeurs (groupe de cases, `select multiple`) est reconnu :
 `{{q:checked:options:pro}}` coche si `pro` fait partie des valeurs envoyées.
+
+**La forme sans valeur est faite pour la case à cocher unique.** Une case sans attribut
+`value` est postée par le navigateur avec la valeur `on`, un nom que tu n'as écrit nulle
+part et que tu ne peux donc pas comparer :
+
+```html
+<input type="checkbox" name="consentement" {{q:checked:consentement}}>
+```
+
+Avec une valeur explicite, garde la forme complète — elle compare littéralement.
 
 La recherche se fait sur la **clé postée littérale**. Un champ nommé `address.city` se lit
 `{{q:value:address.city}}` — il n'y a pas de navigation dans un objet.
@@ -103,6 +139,11 @@ anti-spam au visiteur. L'exclusion porte sur **le validateur**, pas sur le messa
 un vrai champ dont la règle n'a pas de message reste listé, avec son libellé à défaut de
 phrase. C'est volontaire — un champ en erreur qui disparaît du résumé est précisément
 l'impasse que ce résumé existe pour éviter.
+
+`{{q:haserrors}}` applique **le même critère**. Une soumission qui ne rate que le piège —
+un bot, ou un gestionnaire de mots de passe qui remplit le champ caché — ne marque donc
+pas le formulaire en erreur : sinon le visiteur verrait la classe d'erreur avec un résumé
+vide, et rien à corriger.
 
 `{{q:messages}}` produit :
 
@@ -137,6 +178,10 @@ Il ajuste la balise `<form>` quand c'est nécessaire, sans jamais écraser ce qu
 - `enctype="multipart/form-data"` si le formulaire contient un `<input type="file">` —
   sans quoi seul le nom du fichier serait envoyé ;
 - les hidden `form` et `_csrf` s'ils manquent.
+
+Cela s'applique à **chaque** balise `<form>` du champ, pas seulement à la première : un
+second formulaire sans `name="form"` déclencherait les actions de tous les blocs de la
+page, et échouerait sur la règle `csrf`.
 
 Sur un markup sans balise `<form>` (le corps d'un email), rien de tout cela ne
 s'applique.
