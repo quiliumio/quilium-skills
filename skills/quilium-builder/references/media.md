@@ -119,5 +119,6 @@ tabsets:
 
 `keep` (the default) never touches the media — the right choice for reusable images (logos,
 photos). `cascade` is for disposable documents owned by the item. `orphan` checks the media's other
-references at purge time. Rules apply at the item's **hard delete** (trash purge), so restoring an
-item from the trash restores it with its media intact.
+references when the item is trashed. Rules apply as soon as the item goes to the **trash** (manual
+delete or retention): the media lands in the media trash at the same time. Restoring the item from
+the trash restores the media it dragged along, as long as they have not been purged yet.
