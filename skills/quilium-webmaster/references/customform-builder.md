@@ -548,6 +548,8 @@ permet pas — une mise en page sur mesure, un composant tiers. Alors :
 
 - n'écris **pas** de `builder`, ou mets `mode: libre` ;
 - suis `customform-html.md` pour le vocabulaire, et garde `{{_form.id}}` ;
+- prends les classes dans le design system du site (instructions IA du site, champ
+  `ai_instructions` de `get-site-context`), jamais de mémoire ;
 - **dis au client** que son formulaire ne sera plus modifiable dans le constructeur.
 
 Le silence sur ce point est ce qui coûte le plus cher ensuite.

@@ -53,7 +53,15 @@ Les classes des exemples ci-dessous (`border-gray-300`, `border-red-500`…) son
 **marqueurs neutres**. Elles ne sont là que pour montrer *où* les classes vont — remplace-les
 systématiquement par celles du site que tu traites.
 
-Trois sources, par ordre de fiabilité :
+Commence par **les instructions IA du site** : champ `ai_instructions` de
+`get-site-context`. C'est la seule source que tu lis sans accès aux fichiers du thème, et
+l'intégrateur y a consigné, à la mise en place, ce dont tu as besoin : comment Tailwind est
+chargé, et les classes d'un conteneur de champ, d'un label, d'un input, d'un bouton et de
+l'état d'erreur **telles qu'elles sont réellement utilisées sur ce site**. Reprends-les
+telles quelles, sans les « améliorer ».
+
+Si tu as accès aux fichiers du thème (dépôt du site), trois sources de plus, par ordre de
+fiabilité :
 
 1. **un élément de formulaire déjà présent dans le thème** (`elements/contactForm.liquid`,
    `elements/newsletterCta.liquid`…) — la plus fiable, parce qu'elle donne les classes
@@ -62,8 +70,11 @@ Trois sources, par ordre de fiabilité :
    ligne, ou lien vers le CSS compilé ;
 3. **un `brand/design-system.html`** quand le projet en a un.
 
-Si aucune n'existe, demande plutôt que d'inventer : un formulaire en classes Bootstrap sur
-un site Tailwind se voit au premier coup d'œil.
+Si les instructions IA ne disent rien du design et que tu n'as pas le thème, **demande**
+plutôt que d'inventer : un formulaire en classes Bootstrap sur un site Tailwind se voit au
+premier coup d'œil. Et rappelle-toi que le constructeur (`customform-builder.md`) n'a pas
+ce problème : ses classes `q-form` / `q-field` sont habillées par le thème. Le mode libre
+doit rester l'exception.
 
 Deux pièges liés :
 
