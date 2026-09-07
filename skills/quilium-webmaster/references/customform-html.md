@@ -1,5 +1,13 @@
 # Les placeholders `{{_field.…}}` / `{{_form.…}}` — référence exhaustive
 
+> **Avant d'écrire du HTML à la main, lis `customform-builder.md`.** Le constructeur visuel
+> du backoffice ne s'ouvre que sur un formulaire décrit par la clé `builder`. Un HTML écrit
+> à la main est traité comme le travail d'un intégrateur : le constructeur refuse de
+> l'écraser, et **le client ne peut plus rien modifier à la souris**. N'écris le HTML
+> toi-même que si le client demande un balisage que le contrat `q-form` / `q-field` ne
+> permet pas — et dis-le-lui. Ce fichier reste la référence du vocabulaire, quelle que
+> soit la voie.
+
 Le HTML stocké dans le champ `formHtml` n'est **pas** compilé par Liquid ou Nunjucks —
 le faire donnerait à n'importe quel éditeur du CMS l'exécution de template côté serveur.
 À la place, un interpolateur dédié remplace un jeu **fermé** de motifs.

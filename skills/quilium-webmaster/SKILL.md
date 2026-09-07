@@ -102,7 +102,8 @@ you're entitled to do.
 | Find broken links | `tasks-seo-find-broken-links` |
 | Reorder or re-parent the menu | `reference-navigation` |
 | Embed a video or a widget | `tasks-content-html-embed` |
-| Write or change a **customform** — its markup, its rules, its emails | `references/customform-html.md`, `-validation.md`, `-emails.md` |
+| Create or rebuild a **customform** | `references/customform-builder.md` first — the model that keeps the form editable in the visual builder |
+| Change a customform's markup, rules or emails by hand | `references/customform-html.md`, `-validation.md`, `-emails.md` |
 | A large authoring session | `processes-content-ops-bulk-authoring` |
 | Anything over a handful of calls | `practices-ops-mcp-batching` |
 
@@ -112,16 +113,24 @@ Load fresh — slugs evolve, and the descriptions are the source of truth.
 
 `customform` blocks — the ones whose HTML, validation rules and email bodies all live in
 the content. The MCP library covers no part of them, and improvising the placeholder
-vocabulary produces a form that renders but never validates. So the three references are
+vocabulary produces a form that renders but never validates. So the four references are
 here, in full:
 
 | File | Covers |
 |---|---|
+| `references/customform-builder.md` | **start here** — the `builder` model, the derivation recipe, two complete working examples (YAML, HTML, emails). Writing the model rather than the HTML is what keeps the form editable by the client in the visual builder |
 | `references/customform-html.md` | the `{{_field.…}}` / `{{_form.…}}` vocabulary, matching the client's design system, conditional display |
 | `references/customform-validation.md` | the validation YAML — validators, conditional rules, messages |
 | `references/customform-emails.md` | email bodies, per-instance settings, the two guards that silently block a send |
 
 Recognise a customform by its content-type: it exposes a field of `type: formvalidate`.
+The form's HTML lives in the field named by that field's `config.htmlField` (`formHtml`
+by default), and its emails in the fields named by `config.mails` — read the type, never
+guess the names.
+
+One thing the client must hear from you: a form written as raw HTML — without the
+`builder` key — cannot be edited in the visual builder afterwards. Prefer the model; if
+the client wants bespoke markup, tell them what they give up.
 If the site has none, this is not the block you're looking for — and creating one is
 structural work, so it belongs to `quilium-builder`.
 

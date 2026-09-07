@@ -88,6 +88,11 @@ mail généré.
 
 L'ordre des lignes suit l'ordre de `labels:`, puis l'ordre de soumission pour le reste.
 
+Dans un corps, un champ s'écrit `{{_field.<champ>.value}}` ou, forme brute,
+`{{_request.body.<champ>}}`. **Jamais `{{nom}}` nu** : ce marqueur-là n'existe que pour
+`to`, `subject` et `replyTo`. Dans un corps, il resterait affiché tel quel dans l'email
+reçu — Liquid ne ré-analyse pas une chaîne qu'il vient de produire.
+
 Pour un accusé de réception, une rédaction sur mesure passe mieux :
 
 ```html

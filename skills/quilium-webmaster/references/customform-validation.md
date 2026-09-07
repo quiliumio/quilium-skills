@@ -1,5 +1,10 @@
 # Le YAML de validation — référence exhaustive
 
+> **Pour créer ou refaire un formulaire, commence par `customform-builder.md`.** Il décrit
+> le modèle `builder` — la voie qui laisse le formulaire modifiable à la souris par le
+> client — et donne des exemples complets. Ce fichier-ci est la référence des règles
+> elles-mêmes, que `builder` produit.
+
 Le champ `formvalidate` contient du YAML, validé à l'enregistrement. Un document invalide
 est **refusé en 422** avec la liste complète des problèmes — pas seulement le premier,
 pour que tu corriges tout en une passe.
@@ -41,8 +46,13 @@ cleantalk:        # facultatif — uniquement `silent`
   silent: false
 ```
 
-Sept clés racine, et **rien d'autre** : `rules`, `labels`, `meta`, `success`, `error`,
-`redirect`, `cleantalk`. Toute autre clé est refusée.
+Huit clés racine, et **rien d'autre** : `rules`, `labels`, `meta`, `success`, `error`,
+`redirect`, `cleantalk`, `builder`. Toute autre clé est refusée.
+
+`builder` est le modèle du constructeur visuel — voir `customform-builder.md`. Quand il
+est présent avec `mode: ui`, le CMS vérifie en plus qu'un champ `required: true` a bien une
+règle `required`, `required_if` ou `required_with` dans `rules`. Sinon le formulaire
+afficherait une contrainte que le serveur ne vérifie pas.
 
 ## `rules`
 
@@ -74,8 +84,12 @@ rules:
 La forme courte (`- required`) reste donc réservée aux trois validateurs sans message.
 
 Contraintes : 100 champs maximum, 10 règles par champ, messages de 500 caractères,
-document de 64 Ko. Un nom de champ suit `^[A-Za-z_][A-Za-z0-9_\-\.\[\]]{0,63}$` — ce qui
-autorise `g-recaptcha-response` et `address.city`.
+document de 64 Ko. Un nom de champ dans `rules` suit `^[A-Za-z_][A-Za-z0-9_\-\.\[\]]{0,63}$`
+— ce qui autorise `g-recaptcha-response` et `address.city`.
+
+Attention : **`builder` est plus strict** — ni point, ni crochet, ni espace. Un nom généré
+voyage dans les marqueurs du HTML, où un point peut atteindre un autre champ. Si tu passes
+par le modèle, `address.city` est refusé ; écris `address_city`.
 
 ## Les 11 validateurs
 
