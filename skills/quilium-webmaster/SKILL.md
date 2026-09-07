@@ -73,7 +73,7 @@ The translations one deserves the emphasis: the rule for `update-content` / `upd
 of the rule for `update-itemset-item`. Getting it backwards on collection items produces undefined behaviour,
 not an error. Read §6 every time until it's automatic.
 
-A seventh, specific to `customform` blocks and not covered by the library at all: **a
+A seventh, specific to `customform` blocks: **a
 validation rule whose key doesn't match an input's `name=`** fails on every submission
 while highlighting nothing. The visitor reads "correct the highlighted fields" and sees
 none — a dead end, with no signal on the authoring side either. After touching either the
@@ -130,8 +130,8 @@ you're entitled to do.
 | Find broken links | `tasks-seo-find-broken-links` |
 | Reorder or re-parent the menu | `reference-navigation` |
 | Embed a video or a widget | `tasks-content-html-embed` |
-| Create or rebuild a **customform** | `references/customform-builder.md` first — the model that keeps the form editable in the visual builder |
-| Change a customform's markup, rules or emails by hand | `references/customform-html.md`, `-validation.md`, `-emails.md` |
+| Create or rebuild a **customform** | `reference-forms-customform-builder` first — the model that keeps the form editable in the visual builder |
+| Change a customform's rules, markup or emails by hand | `reference-forms-customform-validation`, `-html`, `-emails` |
 | A task this site has written a procedure for | the `site:` slugs of the `site` group — before anything else |
 | « Remember how we do this » / write it down for next time | `create-ai-skill` — then `get-ai-skill` to check it reads well |
 | A large authoring session | `processes-content-ops-bulk-authoring` |
@@ -139,28 +139,25 @@ you're entitled to do.
 
 Load fresh — slugs evolve, and the descriptions are the source of truth.
 
-## The one procedure this skill does carry
+## `customform` — recognise it, then load the library
 
-`customform` blocks — the ones whose HTML, validation rules and email bodies all live in
-the content. The MCP library covers no part of them, and improvising the placeholder
-vocabulary produces a form that renders but never validates. So the four references are
-here, in full:
+`customform` blocks are the ones whose fields, validation rules and email bodies live in
+the **content**, so the client changes them without a developer. Four skills cover them,
+and they are the only source — they are versioned server-side and this file deliberately
+carries no copy of them:
 
-| File | Covers |
+| Skill | Covers |
 |---|---|
-| `references/customform-builder.md` | **start here** — the `builder` model, the derivation recipe, two complete working examples (YAML, HTML, emails). Writing the model rather than the HTML is what keeps the form editable by the client in the visual builder |
-| `references/customform-html.md` | the `{{_field.…}}` / `{{_form.…}}` vocabulary, matching the client's design system, conditional display |
-| `references/customform-validation.md` | the validation YAML — validators, conditional rules, messages |
-| `references/customform-emails.md` | email bodies, per-instance settings, the two guards that silently block a send |
+| `reference-forms-customform-builder` | **start here** — the `builder` model, the derivation recipe, two complete worked examples. Writing the model rather than raw HTML is what keeps the form editable by the client |
+| `reference-forms-customform-validation` | the validation YAML — validators, conditional rules, messages |
+| `reference-forms-customform-html` | the `{{_field.…}}` / `{{_form.…}}` vocabulary — the form's markup on one route, the email bodies on both |
+| `reference-forms-customform-emails` | email bodies, per-instance settings, the two guards that silently block a send |
 
-Recognise a customform by its content-type: it exposes a field of `type: formvalidate`.
-The form's HTML lives in the field named by that field's `config.htmlField` (`formHtml`
-by default), and its emails in the fields named by `config.mails` — read the type, never
-guess the names.
+What you need before loading them: **recognise the block**. A customform is a content-type
+exposing a field of `type: formvalidate`. Its email bodies live in the fields named by that
+field's `config.mails`, and its HTML — when the site declares one — in `config.htmlField`.
+**Read the content-type**, never guess those names from another site.
 
-One thing the client must hear from you: a form written as raw HTML — without the
-`builder` key — cannot be edited in the visual builder afterwards. Prefer the model; if
-the client wants bespoke markup, tell them what they give up.
 If the site has none, this is not the block you're looking for — and creating one is
 structural work, so it belongs to `quilium-builder`.
 
