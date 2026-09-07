@@ -37,6 +37,10 @@ Ce que le CMS **refuse** au save (422, avec la liste complète des problèmes) :
 - un champ `required: true` dans `builder` **sans règle qui l'impose** dans `rules`. Sinon
   le formulaire afficherait un astérisque et l'attribut `required` que le serveur ne
   vérifie pas — et `required` en HTML se contourne en postant directement.
+- un `builder` qui demande la protection reCAPTCHA (le défaut) **sans règle `recaptcha`**
+  dans `rules`. Hors SMTP personnalisé, le moteur n'envoie aucun email si reCAPTCHA n'a
+  pas été validé — sans erreur. Un formulaire qui l'oublie « marche » en local et n'envoie
+  rien en production. Pour y renoncer, écris `recaptcha: false` dans `builder`.
 
 Ce que le CMS **ne vérifie pas** : `formHtml` et les corps d'emails sont du HTML libre.
 Un `{{_form.id}}` manquant ou un marqueur inexistant ne lèvent rien. Suis la recette.
@@ -48,6 +52,7 @@ builder:
   mode: ui                      # ui | libre — `ui` = constructeur actif
   submitLabel: Envoyer          # facultatif
   trapKey: _hp                  # facultatif ; `false` pour ne pas générer de piège
+  recaptcha: true               # défaut true — écris-le ; `false` pour y renoncer
   fields:
     - key: email                # ^[A-Za-z_][A-Za-z0-9_-]{0,63}$ — ni point, ni crochet, ni espace
       type: email               # text email tel url number date textarea select radio checkbox file
@@ -98,6 +103,7 @@ type: email                      →  - validate: email                    (en p
 type: file + accept              →  - validate: file-extensions data: {allowed: "pdf,docx"}
 type: file + maxSize             →  - validate: file-size       data: {max: 5242880}
 piège (trapKey, défaut _hp)      →  _hp: [- validate: honeypot]         (sans message)
+recaptcha (défaut true)          →  g-recaptcha-response: [- validate: recaptcha]
 ```
 
 Pour `allowed`, retire les points et les espaces de `accept` : `.pdf, .docx` → `pdf,docx`.
@@ -110,6 +116,7 @@ Chaque règle porte un `message`, sauf le piège. Sans message dans `messages:`,
 | `email` | `Cette adresse email n'est pas valide.` |
 | `file-extensions` | `Formats acceptés : <accept>.` |
 | `file-size` | `Fichier trop lourd (<N> Mo maximum).` |
+| `recaptcha` | `Merci de cocher la case « Je ne suis pas un robot ».` |
 
 `labels` reprend `key: label` pour chaque champ. C'est ce que le tableau des emails et
 `{{_field.<champ>.label}}` affichent.
@@ -124,6 +131,7 @@ produirait.
 ```yaml
 builder:
   mode: ui
+  recaptcha: true
   fields:
     - key: nom
       type: text
@@ -160,6 +168,9 @@ rules:
       message: Le champ « J'accepte que mes données soient utilisées pour traiter ma demande » est obligatoire.
   _hp:
     - validate: honeypot
+  g-recaptcha-response:
+    - validate: recaptcha
+      message: Merci de cocher la case « Je ne suis pas un robot ».
 labels:
   nom: Nom
   email: Adresse email
@@ -254,6 +265,7 @@ champs obligatoires, un champ n'est exigé que si un autre est rempli.
 builder:
   mode: ui
   submitLabel: Envoyer ma demande
+  recaptcha: true
   fields:
     - key: sujet
       type: radio
@@ -360,6 +372,9 @@ rules:
       message: Le champ « J'accepte que mes données soient utilisées pour traiter ma demande » est obligatoire.
   _hp:
     - validate: honeypot
+  g-recaptcha-response:
+    - validate: recaptcha
+      message: Merci de cocher la case « Je ne suis pas un robot ».
 labels:
   sujet: Votre demande
   nom: Nom
@@ -517,6 +532,14 @@ Un champ inexistant rend du vide, sans erreur. Vérifie chaque clé citée contr
 Le sujet ne peut citer qu'un champ qui **existe** : `Nouveau message de {{prenom}}` sur un
 formulaire sans champ `prenom` part avec un trou, et personne ne le voit avant de lire
 l'email.
+
+## reCAPTCHA
+
+Le squelette du formulaire contient toujours `{{_form.recaptcha}}`, juste avant le
+bouton : le thème y rend le widget dès qu'une règle `recaptcha` existe, et rien sinon.
+Les clés reCAPTCHA sont une configuration du moteur, pas du site — tu n'as rien à poser.
+Ce qui dépend de toi : la règle dans `rules`, dérivée de `recaptcha: true`. Sans elle,
+en production, l'email ne part pas et personne n'est prévenu.
 
 ## Quand sortir du modèle
 

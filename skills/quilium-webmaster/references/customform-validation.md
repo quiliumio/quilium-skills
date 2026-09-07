@@ -54,6 +54,10 @@ est présent avec `mode: ui`, le CMS vérifie en plus qu'un champ `required: tru
 règle `required`, `required_if` ou `required_with` dans `rules`. Sinon le formulaire
 afficherait une contrainte que le serveur ne vérifie pas.
 
+Avec `builder`, le CMS exige aussi la cohérence avec `rules` : un champ `required: true`
+sans règle qui l'impose est refusé, et un `builder` sans `recaptcha: false` exige une
+règle `recaptcha` (sinon, en production, aucun email ne part — en silence).
+
 ## `rules`
 
 Un objet `nom-du-champ: [liste de règles]`. La clé doit correspondre **exactement** à
