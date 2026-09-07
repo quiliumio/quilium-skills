@@ -33,9 +33,18 @@ Three things about `path`:
   serves `/en/news/<page-slug>/my-article`.
 - **The token is interpolated, not colon-prefixed.** `{{article.slug}}`, not `:slug` and not `{slug}`. The name
   inside the token is yours to choose — it is the handle you will use everywhere else.
-- **The leading slash depends on the host page.** If the host page's own slug is empty, `/{{article.slug}}`
-  produces a double slash. Probe the rendered link once (see rule zero in `engine-liquid.md`) rather than
-  assuming.
+- **The host page always has its own slug — never leave it empty.** The route path is appended to the page's
+  URL; it never replaces the page's slug. Two shapes are legal, both with a slugged child:
+  - child `article` under `/news`, « Prefix URL with parent slugs » on (`isSlugPrefixed: true`, the default)
+    → `/en/news/article/my-article`;
+  - child `article` with `isSlugPrefixed: false` → `/en/article/my-article`, wherever it sits in the tree.
+
+  What does **not** work is emptying the child's slug and writing `/news/{{article.slug}}` into the route,
+  hoping for `/en/news/my-article`. A child with an empty slug computes the same URL as its parent, and the
+  `unique_url` rule rejects the save — the page is never created, and the route has nothing to attach to.
+  `/en/news/my-article` is not reachable through a hidden child page at all. The only way to get it is to host
+  the route on the listing page itself (`/news` + `/{{article.slug}}`) and let one page-type serve both the
+  listing and the detail — which is why section 6 insists on three branches.
 
 A route with **no** parameter — for a fixed page you need to link to — is the empty path, and it takes two
 calls because `create-route` rejects `path: ""`:
@@ -120,8 +129,10 @@ Created like any other page, with two settings that are easy to confuse:
 - **`state: active`** — it must stay active. `state` is routability, not publication. An `inactive` page 404s
   everywhere, including locally, and `publish-page` does not change it.
 
-If the detail URL should sit under its listing (`/news/my-article`), re-parent the hidden page under the
-listing page. Re-parenting is `reorder-navigation` — `update-page` does not move a page in the tree.
+If the detail URL should sit under its listing (`/news/article/my-article`), re-parent the hidden page under
+the listing page and keep « Prefix URL with parent slugs » on. Re-parenting is `reorder-navigation` —
+`update-page` does not move a page in the tree. If it should sit at the root (`/article/my-article`), set
+`isSlugPrefixed: false` on the page instead. Either way the page keeps its own slug (rule 3 above).
 
 An ItemSet's back-office `preview` link only starts working once the route exists.
 
