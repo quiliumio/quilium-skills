@@ -33,6 +33,25 @@ item. When the task matches one, **load it first** (`get-skill site:<slug>`) and
 skills wherever the two disagree, except on safety and on the hazards below. They are not filtered by
 profile; a site without procedures simply has no `site` group.
 
+You can write them too. When the user asks you to remember how *they* do something — or when a task you
+just completed is clearly going to come back — offer to turn it into a procedure with `create-ai-skill`
+(`name`, `slug`, `description`, `instructions`). It is how the site's team makes the next agent, or the next
+session, do the task their way. `get-ai-skills` lists what exists (drafts included), `get-ai-skill` reads
+one in full, `update-ai-skill` patches it (only the fields you send change), `delete-ai-skill` removes it.
+Two things to get right:
+
+- **`site:` is not part of the slug.** It is a prefix `get-skills` adds to tell a site procedure from a
+  library skill. Store `menu-semaine`, load `site:menu-semaine`. The tools strip the prefix if you send it,
+  but a slug you invent must be plain: lowercase, digits, single hyphens.
+- **The description is what makes it findable.** Say *when* to use the procedure, not what it is —
+  « Importer le menu de la semaine depuis le PDF du chef » beats « Procédure menu ». The instructions are
+  Markdown, up to 100 KB: the steps, the tool calls, the exact field keys, what the site never wants.
+  Write them the way you'd want to read them cold, because that is how they will be read.
+
+`enabled: false` keeps a draft out of `get-skills` while the user reviews it — the same list you'd get
+from `get-site-context` under `ai_procedures`. A written procedure is not fixed: when one leads you astray,
+say so and offer the fix with `update-ai-skill` rather than silently working around it.
+
 First contact with any site: `get-site-settings` and `get-navigations-with-pages`. Always.
 
 ## Hazard index — what corrupts data quietly
@@ -114,6 +133,7 @@ you're entitled to do.
 | Create or rebuild a **customform** | `references/customform-builder.md` first — the model that keeps the form editable in the visual builder |
 | Change a customform's markup, rules or emails by hand | `references/customform-html.md`, `-validation.md`, `-emails.md` |
 | A task this site has written a procedure for | the `site:` slugs of the `site` group — before anything else |
+| « Remember how we do this » / write it down for next time | `create-ai-skill` — then `get-ai-skill` to check it reads well |
 | A large authoring session | `processes-content-ops-bulk-authoring` |
 | Anything over a handful of calls | `practices-ops-mcp-batching` |
 
