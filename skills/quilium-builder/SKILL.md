@@ -1,6 +1,6 @@
 ---
 name: quilium-builder
-description: Load when building or restructuring a Quilium CMS site — designing the architecture (page-types, content-types, ItemSets, global fields), writing YAML schemas, wiring routes and detail pages, scaffolding Liquid templates, porting a static HTML prototype, uploading media, or setting up a project locally. Covers the end-to-end process for a new site, the listing-to-detail chain, images, the 404, and the CLI loop (init, run, push, dictionary). Triggers on "new Quilium site", "build this site", "design the architecture", "create a content type", "add a page type", "scaffold a template", "port this prototype", "detail page", "the links point to the wrong page", "images are missing", "the 404 doesn't work", "set up the project", "quilium init", "quilium push", "the site doesn't render", "wysiwyg or repeat", "custom wysiwyg styles", "editor style palette", "should this be a rich text field". For content work on a site that already runs, use quilium-webmaster instead.
+description: Load when building or restructuring a Quilium CMS site — designing the architecture (page-types, content-types, ItemSets, global fields), writing YAML schemas, wiring routes and detail pages, scaffolding Liquid templates, porting a static HTML prototype, uploading media, or setting up a project locally. Covers the end-to-end process for a new site, the listing-to-detail chain, images, the 404, and the CLI loop (init, run, push, dictionary). Triggers on "new Quilium site", "build this site", "design the architecture", "create a content type", "add a page type", "scaffold a template", "port this prototype", "detail page", "the links point to the wrong page", "images are missing", "the 404 doesn't work", "set up the project", "quilium init", "quilium push", "the site doesn't render", "wysiwyg or repeat", "custom wysiwyg styles", "editor style palette", "should this be a rich text field". Load quilium-webmaster ALONGSIDE this skill — every build ends with a content phase (step 5), and that skill carries the content discipline. For content work on a site that already runs, quilium-webmaster alone is enough.
 ---
 
 # Quilium builder
@@ -24,6 +24,10 @@ Before any non-trivial CMS operation:
 
 Two skills are worth loading in almost every session: `meta-getting-started` once, and
 `practices-ops-mcp-batching` for anything over a handful of calls.
+
+When a site is in scope, the manifest may open with a group `site` — the procedures the site's own team wrote
+in the CMS (slugs `site:…`). Rare on a site you are building, decisive on one you are restructuring: a
+procedure describes how the site works today, read it before changing the structure it relies on.
 
 ### The library is smaller than you expect, and that is not an error
 
@@ -189,5 +193,7 @@ skill that isn't coming.
 ## What this skill is not
 
 Not a schema reference — that's the MCP library, and it's more current than any copy.
-Not a content-authoring guide — that's `quilium-webmaster`.
-Not site-specific — per-site conventions belong in the project's own `CLAUDE.md`.
+Not a content-authoring guide — that's `quilium-webmaster`, loaded alongside this one: a build is not
+structure alone, it ends with media and content (step 5), and that phase follows the webmaster's discipline.
+Not site-specific — per-site conventions belong in the project's own `CLAUDE.md`, and what a site does its
+own way lives in its procedures (the `site` group of `get-skills`).

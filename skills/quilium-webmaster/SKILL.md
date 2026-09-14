@@ -24,6 +24,15 @@ Before any non-trivial operation:
 If a skill is refused for your profile, say so and continue with what you can load rather than guessing at
 its contents.
 
+### The site's own procedures come first
+
+When a site is in scope, the manifest opens with a group **`site` — « Procédures de ce site »**: procedures
+the site's own team wrote in the CMS (Settings → AI), with slugs prefixed `site:`. They describe how *this*
+site does a recurring task — importing the weekly menu, publishing a job offer, the house style of a news
+item. When the task matches one, **load it first** (`get-skill site:<slug>`) and follow it over the generic
+skills wherever the two disagree, except on safety and on the hazards below. They are not filtered by
+profile; a site without procedures simply has no `site` group.
+
 First contact with any site: `get-site-settings` and `get-navigations-with-pages`. Always.
 
 ## Hazard index — what corrupts data quietly
@@ -104,6 +113,7 @@ you're entitled to do.
 | Embed a video or a widget | `tasks-content-html-embed` |
 | Create or rebuild a **customform** | `references/customform-builder.md` first — the model that keeps the form editable in the visual builder |
 | Change a customform's markup, rules or emails by hand | `references/customform-html.md`, `-validation.md`, `-emails.md` |
+| A task this site has written a procedure for | the `site:` slugs of the `site` group — before anything else |
 | A large authoring session | `processes-content-ops-bulk-authoring` |
 | Anything over a handful of calls | `practices-ops-mcp-batching` |
 
@@ -138,4 +148,5 @@ structural work, so it belongs to `quilium-builder`.
 
 Not a procedure manual — procedures live in the MCP library.
 Not the structural layer — that's `quilium-builder`.
-Not site-specific — per-site conventions belong in the project's own `CLAUDE.md`.
+Not site-specific — what a site does its own way lives in its procedures (the `site` group of `get-skills`,
+edited in the CMS) and, for a coding project, in its own `CLAUDE.md`.

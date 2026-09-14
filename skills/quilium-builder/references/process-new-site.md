@@ -154,6 +154,10 @@ discipline, not a formality, and the drift it prevents is invisible in the conte
 keep the file → uuid table, then wire the fields. `media.md` covers the whole path, including why a missing
 version key renders `src=""` without erroring.
 
+This is where the work changes nature: the structure is done, what follows is content authoring. Switch to
+`quilium-webmaster` here — its discipline (write wrappers, reference shapes, the inverted translation contract,
+never publishing unasked) applies to every call of this step, and to the site's own procedures if it has any.
+
 Then real content, in draft. Templates first, content second — you want to see one block render correctly
 before authoring fifty.
 
