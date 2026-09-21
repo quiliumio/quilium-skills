@@ -73,7 +73,11 @@ reverting to typed fields at the keyboard. It lives in site-wide settings, which
 rule at the end of this step applies to it too. Details in `reference-wysiwyg-config`.
 
 **1 · ItemSets** — including the collection that will store form submissions, which must exist before the form
-content-type that writes into it.
+content-type that writes into it. Several forms, or a client who will add his own: ONE shared collection —
+declared common fields, a catch-all `json`, a `tag` filled with each form's label, one left-panel view per
+form (`practices-patterns-form-requests-collection`; CMS builds of late September 2026 onwards). One
+collection per form only for attachments, an upsert, or form-specific business fields. Either way the
+form's inputs are named after the collection's fields.
 
 **2 · content-types** — every one with an explicit `template:`. A type without one falls back to a filename
 derived from its key, which won't exist, and you get a dangling reference that `push` reports later.

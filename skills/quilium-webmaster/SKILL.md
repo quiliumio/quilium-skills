@@ -130,7 +130,7 @@ you're entitled to do.
 | Find broken links | `tasks-seo-find-broken-links` |
 | Reorder or re-parent the menu | `reference-navigation` |
 | Embed a video or a widget | `tasks-content-html-embed` |
-| Create or rebuild a **customform** | `reference-forms-customform-builder` first — the model that keeps the form editable in the visual builder |
+| Create or rebuild a **customform** | `reference-forms-customform-builder` first — its pre-flight (reuse the field keys of the collection the form saves into, ask redirect-or-message, write the form's `tag:`), then the model that keeps the form editable in the visual builder |
 | Change a customform's rules, markup or emails by hand | `reference-forms-customform-validation`, `-html`, `-emails` |
 | A task this site has written a procedure for | the `site:` slugs of the `site` group — before anything else |
 | « Remember how we do this » / write it down for next time | `create-ai-skill` — then `get-ai-skill` to check it reads well |
@@ -154,9 +154,16 @@ carries no copy of them:
 | `reference-forms-customform-emails` | email bodies, per-instance settings, the two guards that silently block a send |
 
 What you need before loading them: **recognise the block**. A customform is a content-type
-exposing a field of `type: formvalidate`. Its email bodies live in the fields named by that
+exposing a `validate` field with `config.builder: true` (`type: formvalidate` on sites set up
+before the two types merged). Its email bodies live in the fields named by that
 field's `config.mails`, and its HTML — when the site declares one — in `config.htmlField`.
 **Read the content-type**, never guess those names from another site.
+
+Read it for one more thing: a `type: save` field. Its `config.key` names the collection every
+submission is written to, and **that collection's declared fields are the keys your form must
+reuse** — `lastname` + `firstname` when it declares them, never a single `name`. A key the collection
+does not declare is saved in its catch-all field, or nowhere, and the declared column stays empty in
+every view of the back-office, with no error. The builder skill's pre-flight walks through it.
 
 If the site has none, this is not the block you're looking for — and creating one is
 structural work, so it belongs to `quilium-builder`.
