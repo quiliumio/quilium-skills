@@ -17,13 +17,17 @@ and when*, not to remember what it says.
 Before any non-trivial CMS operation:
 
 1. Call **`get-skills`** to get the live manifest. Cache it for the session.
-2. Pick **every** skill that matches the task. A real task needs 2–6, not one.
-3. Load each with **`get-skill <slug>`**, in parallel when independent. Follow `related:` transitively.
-4. Call **`get-site-settings`** to learn what this site actually has. Never infer structure from another project.
+2. Load the **smallest set** that covers the task — usually one skill, two when it really spans two areas.
+   Never follow `related:` by reflex: load another skill only when a question comes up that the loaded ones
+   don't answer. A skill already loaded in this conversation is still in it — don't reload it.
+3. Load each with **`get-skill <slug>`**, in parallel when independent.
+4. Read what this site actually has with the narrowest call — `get-site-settings` with the one `type` you
+   need (not `all`). Never infer structure from another project.
 5. Then act.
 
-Two skills are worth loading in almost every session: `meta-getting-started` once, and
-`practices-ops-mcp-batching` for anything over a handful of calls.
+Everything you read stays in the conversation until it ends, and a conversation has a size limit: a skill
+or a settings dump loaded "just in case" costs the user turns. `practices-ops-mcp-batching` is worth
+loading for anything over a handful of calls.
 
 When a site is in scope, the manifest may open with a group `site` — the procedures the site's own team wrote
 in the CMS (slugs `site:…`). Rare on a site you are building, decisive on one you are restructuring: a
