@@ -16,10 +16,17 @@ library**, which is versioned server-side and more current than any copy. Load i
 Before any non-trivial operation:
 
 1. **`get-skills`** — the live manifest. Cache it for the session.
-2. Pick **every** relevant skill. A real task needs 2–6, not one.
-3. **`get-skill <slug>`** for each, in parallel when independent. Follow `related:` transitively.
-4. **`get-site-settings`** — learn what *this* site has. Never infer structure from another project.
+2. Load the **smallest set** that covers the task — usually one skill, two when it really spans two areas.
+   Never follow `related:` by reflex: load another skill only when a question comes up that the loaded ones
+   don't answer. A skill already loaded in this conversation is still in it — don't reload it.
+3. **`get-skill <slug>`** for each, in parallel when independent.
+4. Read what *this* site has — only what the task needs, with the narrowest call: `get-site-settings` with
+   the one `type` you need (not `all`), `get-page-with-content` when you know the page. Never infer
+   structure from another project.
 5. Act.
+
+Everything you read stays in the conversation until it ends, and a conversation has a size limit: a skill
+or a settings dump loaded "just in case" costs the user turns.
 
 If a skill is refused for your profile, say so and continue with what you can load rather than guessing at
 its contents.
@@ -44,15 +51,21 @@ Two things to get right:
   library skill. Store `menu-semaine`, load `site:menu-semaine`. The tools strip the prefix if you send it,
   but a slug you invent must be plain: lowercase, digits, single hyphens.
 - **The description is what makes it findable.** Say *when* to use the procedure, not what it is —
-  « Importer le menu de la semaine depuis le PDF du chef » beats « Procédure menu ». The instructions are
-  Markdown, up to 100 KB: the steps, the tool calls, the exact field keys, what the site never wants.
-  Write them the way you'd want to read them cold, because that is how they will be read.
+  « Importer le menu de la semaine depuis le PDF du chef » beats « Procédure menu ».
+- **The instructions are as long as the rule, no longer.** They are loaded into every conversation that
+  uses them. Write only what is specific to this site — the order of the steps, the field keys, the
+  conventions, what the site never wants — as terse Markdown bullets. Never re-explain how the tools work
+  or restate a library skill. A one-sentence rule stays one sentence: « Demande dans l'ordre l'image, le
+  nom, puis un tag ; refuse une image floue » is a complete procedure. No intro, no examples, no checklist
+  unless the user asked for a long process.
 
 `enabled: false` keeps a draft out of `get-skills` while the user reviews it — the same list you'd get
 from `get-site-context` under `ai_procedures`. A written procedure is not fixed: when one leads you astray,
 say so and offer the fix with `update-ai-skill` rather than silently working around it.
 
-First contact with any site: `get-site-settings` and `get-navigations-with-pages`. Always.
+`get-navigations-with-pages` returns the whole site tree — on a large site it is the heaviest read you can
+make. Call it to locate a page or to work on the menus, not by reflex; when the screen context or the user
+already gives you the page, start from that.
 
 ## Hazard index — what corrupts data quietly
 
@@ -64,14 +77,14 @@ a compressed rule is how you get a confident, wrong answer. Load the skill.
 |---|---|
 | The write wrapper differs between content blocks and collection items | `practices-ops-mcp-batching` §4 |
 | Media, page and relation references have one required shape | `practices-ops-mcp-batching` §5 |
-| **The translation contract is not the same for pages/blocks and for collection items** — it is inverted | `practices-ops-mcp-batching` §6 |
+| **A locale's translated `custom` / `metas` is stored whole** — sending only the changed keys erases that locale's other translations | `practices-ops-mcp-batching` §6 |
 | A settings write replaces its whole target, not just the keys you sent | read → merge → write complete |
 | Page `state` is routability, not publication — and publishing doesn't change it | `tasks-pages-crud` |
-| Page reference fields are a rebuilt relation and don't merge on update | `practices-ops-mcp-batching` §5 |
+| A list field you send (relations, pages, tags, media, repeat) replaces the whole list — omitted fields are kept, but a partial list loses the rest | send it complete, or use `array_edits` (`update-content` / `update-page` / `update-itemset-item`) |
 
-The translations one deserves the emphasis: the rule for `update-content` / `update-page` is the **opposite**
-of the rule for `update-itemset-item`. Getting it backwards on collection items produces undefined behaviour,
-not an error. Read §6 every time until it's automatic.
+The translations one deserves the emphasis: pages and blocks take several locales per call, collection
+items one per call — and in every case the call succeeds while silently dropping the translated keys you
+didn't resend. Read §6 before any translation write.
 
 A seventh, specific to `customform` blocks: **a
 validation rule whose key doesn't match an input's `name=`** fails on every submission
@@ -85,7 +98,9 @@ versions from the type's own configuration.
 ## What you don't do
 
 - **Publish.** `publish-page` runs only when the user asks, page by page. Bulk publication is their decision,
-  never a side effect of your work.
+  never a side effect of your work. Collection items have no system publication — a type may declare its
+  own field for it (`state`, `active`, a publish date…). Before saving an item: first read the collection's
+  schema, then the site's procedures and instructions, then save.
 - **Delete or overwrite without confirming.** They can revert your message; they can't revert the database.
 - **Touch structure**, if your profile is content-only: YAML types, routes, templates, dictionaries and
   settings are the builder's domain. The server enforces this — a missing tool is an answer, not an obstacle.
@@ -130,7 +145,7 @@ you're entitled to do.
 | Find broken links | `tasks-seo-find-broken-links` |
 | Reorder or re-parent the menu | `reference-navigation` |
 | Embed a video or a widget | `tasks-content-html-embed` |
-| Create or rebuild a **customform** | `reference-forms-customform-builder` first — its pre-flight (reuse the field keys of the collection the form saves into, ask redirect-or-message, write the form's `tag:`), then the model that keeps the form editable in the visual builder |
+| Add a form | by default a form with a hard-coded template + `validate` — `reference-forms`; a **form builder** (customform) only when the user asks for one — then ask whether it renders with the site's form design system (custom HTML) or with a template of fields: `reference-forms-customform-builder` first, with its pre-flight (reuse the field keys of the collection the form saves into, ask redirect-or-message, write the form's `tag:`) |
 | Change a customform's rules, markup or emails by hand | `reference-forms-customform-validation`, `-html`, `-emails` |
 | A task this site has written a procedure for | the `site:` slugs of the `site` group — before anything else |
 | « Remember how we do this » / write it down for next time | `create-ai-skill` — then `get-ai-skill` to check it reads well |
@@ -154,10 +169,11 @@ carries no copy of them:
 | `reference-forms-customform-emails` | email bodies, per-instance settings, the two guards that silently block a send |
 
 What you need before loading them: **recognise the block**. A customform is a content-type
-exposing a `validate` field with `config.builder: true` (`type: formvalidate` on sites set up
-before the two types merged). Its email bodies live in the fields named by that
-field's `config.mails`, and its HTML — when the site declares one — in `config.htmlField`.
-**Read the content-type**, never guess those names from another site.
+exposing a `validate` field with `config.builder: true` (a legacy `type: formvalidate` is read
+the same way but refused at the next settings save). Its HTML lives in the sibling field
+`formHtml` and its email bodies in `mailAdminBody` / `mailUserBody` — by naming convention,
+nothing declares them (`config.htmlField` / `config.mails` are refused). **Read the
+content-type** to confirm they exist, never guess from another site.
 
 Read it for one more thing: a `type: save` field. Its `config.key` names the collection every
 submission is written to, and **that collection's declared fields are the keys your form must
