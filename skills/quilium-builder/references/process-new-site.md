@@ -153,7 +153,7 @@ discipline, not a formality, and the drift it prevents is invisible in the conte
 
 ## Step 5 — media, then content
 
-**Media first.** Images live in the media library, uploaded through the MCP — they do not travel with
+**Media first.** Images live in the media library, uploaded through the MCP or `quilium media upload` — they do not travel with
 `quilium push`, and content can't reference a media that doesn't exist yet. Upload them with their alt text,
 keep the file → uuid table, then wire the fields. `media.md` covers the whole path, including why a missing
 version key renders `src=""` without erroring.

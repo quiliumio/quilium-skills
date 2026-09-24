@@ -83,10 +83,11 @@ delivery even if you're not shipping:
 
 Aim for zero warnings. Every one of them is a real dangling reference.
 
-Note that `push` uploads *files*. Content, schemas and settings live in the CMS and travel through the MCP —
-pushing does not carry them, and a local config file is not part of the archive.
+Note that `push` uploads *files*. Content, schemas and settings live in the CMS — pushing does not carry
+them. `quilium.json` **is** part of the archive: the platform reads `private` from it, and a theme without it
+serves its draft as private. Local endpoint overrides in it travel too.
 
-## `quilium dictionary`
+## `quilium dictionary parse`
 
 Extracts the translatable interface strings from your templates into the CMS dictionary.
 
@@ -97,7 +98,8 @@ Extracts the translatable interface strings from your templates into the CMS dic
 The working order is:
 
 1. Write templates using the translation filter.
-2. Run `quilium dictionary` — it uploads the message ids.
+2. Run `quilium dictionary parse` — it uploads the message ids. `quilium push` does it too, after the
+   archive.
 3. `get-dictionary missing_locale: <slug>` — returns ids and source strings.
 4. `update-dictionary-translations` — batched, one locale per call.
 
@@ -107,6 +109,7 @@ remaining locales from the back-office and report it with `submit-feedback`.
 
 ## Authentication
 
-The CLI keeps its token under `~/.quilium/`. With it present, `quilium run` renders the live site's data
+`quilium login` (`-p staging` for staging) keeps the session under `~/.quilium/`; `quilium whoami` tells you
+which account it is and whether it reaches this site. With it present, `quilium run` renders the live site's data
 against your local templates — which is what makes the loop fast, and also means **you are looking at real
 content**. Treat destructive operations accordingly.

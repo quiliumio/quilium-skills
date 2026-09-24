@@ -1,6 +1,6 @@
 ---
 name: quilium-builder
-description: Load when building or restructuring a Quilium CMS site — designing the architecture (page-types, content-types, ItemSets, global fields), writing YAML schemas, wiring routes and detail pages, scaffolding Liquid templates, porting a static HTML prototype, uploading media, or setting up a project locally. Covers the end-to-end process for a new site, the listing-to-detail chain, images, the 404, and the CLI loop (init, run, push, dictionary). Triggers on "new Quilium site", "build this site", "design the architecture", "create a content type", "add a page type", "scaffold a template", "port this prototype", "detail page", "the links point to the wrong page", "images are missing", "the 404 doesn't work", "set up the project", "quilium init", "quilium push", "the site doesn't render", "wysiwyg or repeat", "custom wysiwyg styles", "editor style palette", "should this be a rich text field". Load quilium-webmaster ALONGSIDE this skill — every build ends with a content phase (step 5), and that skill carries the content discipline. For content work on a site that already runs, quilium-webmaster alone is enough.
+description: Load when building or restructuring a Quilium CMS site — architecture (page-types, content-types, ItemSets, global fields), YAML schemas, routes and detail pages, Liquid templates, porting an HTML prototype, images, the 404, the CLI loop (init, run, push, dictionary), and content from the shell (bulk imports, long fields edited as files). Triggers on "new Quilium site", "build this site", "design the architecture", "create a content type", "add a page type", "scaffold a template", "port this prototype", "detail page", "the links point to the wrong page", "images are missing", "the 404 doesn't work", "set up the project", "quilium init", "quilium push", "quilium content", "quilium item", "import this into the CMS", "the site doesn't render", "wysiwyg or repeat", "custom wysiwyg styles", "editor style palette". Load quilium-webmaster ALONGSIDE this skill — every build ends with a content phase (step 5). For content work on a site that already runs, quilium-webmaster alone is enough.
 ---
 
 # Quilium builder
@@ -116,7 +116,8 @@ detail and the reasoning.
 3. **Base layout** — one `layout.liquid` that renders, with header, footer and nav — and the 404, registered
    in the settings.
 4. **Templates** — one per content-type and page-type.
-5. **Media, then content** — uploads first, since content references them by uuid. In draft.
+5. **Media, then content** — uploads first, since content references them by uuid. In draft. With the CLI
+   installed, bulk rows and long fields go through it (`references/cli-content.md`) — your call.
 
 Templates come **before** content: you want to see a block render before you author fifty of them.
 
@@ -148,7 +149,8 @@ These aren't preferences. Each one, broken, produces a failure that looks like s
   mis-shaped argument dumps the whole record into the query string. Detail pages are the sharp edge —
   `references/detail-pages.md` before you wire one.
 - **Images are uploaded, not pushed.** `quilium push` carries `public/`; content images live in the media
-  library and reach it only through the MCP. An image you never uploaded renders `src=""` and warns nobody.
+  library and reach it only by an upload (MCP, or `quilium media upload`). An image you never uploaded renders
+  `src=""` and warns nobody.
 - **Register the 404 in the settings.** A `404.liquid` that exists on disk but isn't declared in
   `miscellaneous.rendering.404` is not the site's 404 — every unknown URL errors instead.
 - **Define page-types before creating pages.** A page freezes its template at creation; changing the page-type
@@ -184,6 +186,7 @@ skill that isn't coming.
 | Batch more than a handful of MCP calls | `practices-ops-mcp-batching` | serialise and read each response |
 | SEO metadata | `practices-compliance-seo-basics` | — |
 | Run the CLI | — | `references/local-dev.md` |
+| Import rows, or edit a long field as a file | — | `references/cli-content.md` (if the CLI is installed; otherwise MCP) |
 
 ## Bundled references
 
@@ -193,6 +196,8 @@ skill that isn't coming.
 - `references/media.md` — images end to end: upload, reference, schema versions, render.
 - `references/from-a-prototype.md` — porting an approved HTML prototype without redesigning it.
 - `references/local-dev.md` — `init`, `run`, `push`, `dictionary`, and the debugging loop.
+- `references/cli-content.md` — content from the shell: blocks, collection rows, media, and when to prefer
+  the CLI over the MCP.
 
 ## What this skill is not
 
