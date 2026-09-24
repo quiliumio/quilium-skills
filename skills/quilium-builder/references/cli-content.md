@@ -101,6 +101,11 @@ The uuid is what a content or item field references — the image-array shape is
 quilium site list                     # a table — finding a uuid is the point
 quilium site create --name "…"        # waits for the deploy, prints the uuid and the `quilium init` line
 quilium site maintenance [on|off]     # "on" takes the live site offline (503) — confirm with the user first
+quilium site public [on|off]          # draft viewable without signing in (client review); live is always public
 ```
+
+`site public` replaces `"private": false` in `quilium.json` (deprecated — never add it to a theme). The key
+still makes the draft public while the switch is off: `quilium site public` reports it, and the draft stays
+public until the key is removed and the theme pushed.
 
 `quilium --help`, `quilium <command> --help` and https://www.quilium.io/en/docs/cli have the rest.

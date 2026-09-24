@@ -84,8 +84,8 @@ delivery even if you're not shipping:
 Aim for zero warnings. Every one of them is a real dangling reference.
 
 Note that `push` uploads *files*. Content, schemas and settings live in the CMS — pushing does not carry
-them. `quilium.json` **is** part of the archive: the platform reads `private` from it, and a theme without it
-serves its draft as private. Local endpoint overrides in it travel too.
+them. `quilium.json` **is** part of the archive: the platform still reads the deprecated `private` from it
+(`quilium site public on|off` replaces it — do not add it). Local endpoint overrides in it travel too.
 
 ## `quilium dictionary parse`
 
