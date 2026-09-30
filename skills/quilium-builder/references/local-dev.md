@@ -109,7 +109,7 @@ remaining locales from the back-office and report it with `submit-feedback`.
 
 ## Authentication
 
-`quilium login` (`-p staging` for staging) keeps the session under `~/.quilium/`; `quilium whoami` tells you
+`quilium login` keeps the session under `~/.quilium/`; `quilium whoami` tells you
 which account it is and whether it reaches this site. With it present, `quilium run` renders the live site's data
 against your local templates — which is what makes the loop fast, and also means **you are looking at real
 content**. Treat destructive operations accordingly.

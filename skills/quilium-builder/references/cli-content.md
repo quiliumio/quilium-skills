@@ -22,11 +22,9 @@ what shape an image takes. Read `get-site-settings(type)` first, the same as for
 Inside a project, the site comes from `quilium.json`. Anywhere else, name it:
 
 ```bash
-quilium nav list --website <site-uuid>              # production
-quilium nav list --website <site-uuid> -p staging   # staging
+quilium nav list --website <site-uuid>
 ```
 
-The pool is always `-p`/`--pool` (`quilium login -p staging` too); omit it for production.
 `quilium whoami` answers "which account am I, and can it reach this site?" — run it before blaming a 403.
 
 ## Finding ids
