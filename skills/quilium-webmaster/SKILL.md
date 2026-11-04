@@ -69,7 +69,7 @@ already gives you the page, start from that.
 
 ## Hazard index — what corrupts data quietly
 
-Six places where a wrong call **succeeds** and writes bad data. This list exists so you recognise the risk
+Five places where a wrong call **succeeds** and writes bad data. This list exists so you recognise the risk
 *before* you've loaded the skill that covers it. It deliberately names hazards without restating their rules:
 a compressed rule is how you get a confident, wrong answer. Load the skill.
 
@@ -77,14 +77,12 @@ a compressed rule is how you get a confident, wrong answer. Load the skill.
 |---|---|
 | The write wrapper differs between content blocks and collection items | `practices-ops-mcp-batching` §4 |
 | Media, page and relation references have one required shape | `practices-ops-mcp-batching` §5 |
-| **A locale's translated `custom` / `metas` is stored whole** — sending only the changed keys erases that locale's other translations | `practices-ops-mcp-batching` §6 |
 | A settings write replaces its whole target, not just the keys you sent | read → merge → write complete |
 | Page `state` is routability, not publication — and publishing doesn't change it | `tasks-pages-crud` |
 | A list field you send (relations, pages, tags, media, repeat) replaces the whole list — omitted fields are kept, but a partial list loses the rest | send it complete, or use `array_edits` (`update-content` / `update-page` / `update-itemset-item`) |
 
-The translations one deserves the emphasis: pages and blocks take several locales per call, collection
-items one per call — and in every case the call succeeds while silently dropping the translated keys you
-didn't resend. Read §6 before any translation write.
+Translation writes have their own limits: pages and blocks take several locales per call, collection
+items one per call. Read §6 before any translation write.
 
 A seventh, specific to `customform` blocks: **a
 validation rule whose key doesn't match an input's `name=`** fails on every submission
