@@ -21,7 +21,8 @@ Before any non-trivial operation:
    don't answer. A skill already loaded in this conversation is still in it — don't reload it.
 3. **`get-skill <slug>`** for each, in parallel when independent.
 4. Read what *this* site has — only what the task needs, with the narrowest call: `get-site-settings` with
-   the one `type` you need (not `all`), `get-page-with-content` when you know the page. Never infer
+   the one `type` you need (not `all`, and `target` for one type or field), `get-page-with-content` when
+   you know the page. Never infer
    structure from another project.
 5. Act.
 

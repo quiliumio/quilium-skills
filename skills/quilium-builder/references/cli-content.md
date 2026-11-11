@@ -47,6 +47,9 @@ quilium content diff $REF block.html                            # a diff of that
 quilium content push $REF block.html                            # --at custom.title for another field
 ```
 
+`push` writes the file as **text**. A repeat, choice or json field takes JSON:
+`quilium content update $REF --json-field custom.questions=@rows.json` (a push there is refused, 422).
+
 Several fields at once, or a short one:
 
 ```bash

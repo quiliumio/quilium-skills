@@ -22,7 +22,8 @@ Before any non-trivial CMS operation:
    don't answer. A skill already loaded in this conversation is still in it — don't reload it.
 3. Load each with **`get-skill <slug>`**, in parallel when independent.
 4. Read what this site actually has with the narrowest call — `get-site-settings` with the one `type` you
-   need (not `all`). Never infer structure from another project.
+   need (not `all`), plus `target` for one type or field (`hero.tabsets.main.fields`). Never infer
+   structure from another project.
 5. Then act.
 
 Everything you read stays in the conversation until it ends, and a conversation has a size limit: a skill
@@ -159,7 +160,8 @@ These aren't preferences. Each one, broken, produces a failure that looks like s
   including locally. "Leave it in draft" means don't publish a live revision — never deactivate.
 - **A settings write replaces its target wholesale.** `update-settings-partial` replaces the whole block you
   aim at, and `update-setting` replaces the entire file. Always read the current value, merge your change into
-  it, and write the result back complete — including the parts you have no opinion about.
+  it, and write the result back complete — including the parts you have no opinion about. The answer of a
+  partial carries `written` (the section as stored): check it there, not by reading the whole file back.
 - **Nothing publishes itself.** Publishing is a human decision, page by page.
 - **Probe before building logic on a filter.** Drop `<!--DBG x=[{{ … }}]-->` into a shared partial, `curl | grep
   DBG`, remove it. Some filters return empty without erroring; a wrong assumption here costs an afternoon.
